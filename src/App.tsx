@@ -1,14 +1,13 @@
-import { useState } from "react";
-import {
-  detectSyllables,
-  toGanas,
-  detectChhanda,
-  ganas,
-} from "./utils/chhandas";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Navbar from "./Navbar";
+import About from "./About";
+import { detectSyllables, toGanas, detectChhanda } from "./utils/chhandas";
+import { GANAS } from "./utils/constant";
 
-export default function App() {
-  const [input, setInput] = useState("");
-  const [output, setOutput] = useState<{
+function Home() {
+  const [input, setInput] = React.useState("");
+  const [output, setOutput] = React.useState<{
     syllables: string[];
     ganaSeq: string[];
     chhanda: string | null;
@@ -22,8 +21,8 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 w-screen">
-      <div className="container mx-auto px-6 py-16 max-w-4xl">
+    <main className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-white to-slate-100 pt-24">
+      <div className="container max-w-4xl mx-auto px-6 py-16">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-light text-slate-800 mb-3 tracking-tight">
@@ -52,7 +51,15 @@ export default function App() {
               <button
                 onClick={handleCheck}
                 disabled={!input.trim()}
-                className="px-8 py-3 bg-slate-800 text-white rounded-full font-medium hover:bg-slate-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className={`
+    px-8 py-3 rounded-xl font-medium text-base
+    transition-all duration-200
+    ${
+      !input.trim()
+        ? "bg-slate-300 text-slate-500 cursor-not-allowed"
+        : "bg-slate-900 text-white hover:bg-slate-800 hover:shadow-lg shadow-slate-900/25"
+    }
+  `}
               >
                 विश्लेषण गर्नुहोस्
               </button>
@@ -95,7 +102,7 @@ export default function App() {
                     key={i}
                     className="px-4 py-2 bg-purple-50 text-purple-800 rounded-xl font-mono text-sm border border-purple-200/50 shadow-sm"
                   >
-                    {ganas[g] || g}
+                    {GANAS[g] || g}
                   </span>
                 ))}
               </div>
@@ -140,12 +147,29 @@ export default function App() {
             <a
               href="https://www.linkedin.com/in/aavashbaral/"
               className="text-black tracking-tight decoration-1 decoration-black/40 underline underline-offset-4"
+              style={{
+                textUnderlineOffset: 4,
+                color: "#1e293b",
+                textDecoration: "underline",
+              }}
             >
               आभाष बराल
             </a>
           </p>
         </footer>
       </div>
-    </div>
+    </main>
+  );
+}
+
+export default function App() {
+  return (
+    <Router>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+      </Routes>
+    </Router>
   );
 }
