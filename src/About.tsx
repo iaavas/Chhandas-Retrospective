@@ -1,30 +1,8 @@
-const chhandasList = [
-  "Anushtubh",
-  "Gayatri",
-  "Trishtubh",
-  "Jagati",
-  "Pankti",
-  "Ushnik",
-  "Brihati",
-  "SatoBrihati",
-  "Atijagati",
-  "Atisankriti",
-  "DvipadaViraj",
-  "Viraj",
-];
-
-const chhandasDescriptions: Record<string, string> = {
-  Anushtubh: "32 मात्रा, 8-8 अक्षरको 4 पाद",
-  Gayatri: "24 मात्रा, 8-8 अक्षरको 3 पाद",
-  Trishtubh: "44 मात्रा, 11-11 अक्षरको 4 पाद",
-  Jagati: "48 मात्रा, 12-12 अक्षरको 4 पाद",
-  Pankti: "40 मात्रा, 10-10 अक्षरको 4 पाद",
-  Ushnik: "28 मात्रा, 7-7 अक्षरको 4 पाद",
-};
+import { CHHANDAS } from "./utils/constant";
 
 export default function About() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100  pt-24">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 pt-24">
       <div className="container max-w-4xl mx-auto px-6 py-16 ">
         {/* Header */}
         <div className="text-center mb-12">
@@ -60,45 +38,50 @@ export default function About() {
 
                 <p className="text-slate-600 text-lg leading-relaxed">
                   छन्दशास्त्र प्राचीन नेपाली साहित्यको एक महत्वपूर्ण अंग हो जसले
-                  कविताको छन्दोबद्धता र लयबद्धतालाई व्यवस्थित गर्दछ।
+                  कविताको संरचना र लयलाई व्यवस्थित बनाउँछ। यसले काव्यको सौन्दर्य
+                  बढाउने र स्मरणीय बनाउने काम गर्छ।
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Supported Chhandas Grid */}
+          {/* Supported Chhandas Section */}
           <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200/50 shadow-xl shadow-slate-200/20 p-8">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-              <h2 className="text-2xl font-light text-slate-800">
-                समर्थित छन्दहरू
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {chhandasList.map((chhanda, index) => (
-                <div
-                  key={chhanda}
-                  className="group p-4 bg-slate-50/50 hover:bg-white/80 rounded-xl border border-slate-200/30 hover:border-slate-300/50 transition-all duration-200 hover:shadow-md"
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg flex items-center justify-center group-hover:from-purple-200 group-hover:to-purple-300 transition-all duration-200">
-                      <span className="text-purple-800 font-semibold text-sm">
-                        {index + 1}
-                      </span>
+            <div className="space-y-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <h2 className="text-2xl font-light text-slate-800">
+                  यस एप्लिकेसनले जाँच गर्न सक्ने छन्दहरू
+                </h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {Object.entries(CHHANDAS).map(([name, pattern], index) => (
+                  <div
+                    key={name}
+                    className="group bg-gradient-to-r from-white to-slate-50/50 border border-slate-200/60 rounded-xl p-6 hover:shadow-lg hover:border-slate-300/80 transition-all duration-300 hover:-translate-y-1"
+                  >
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-8 h-8 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center group-hover:from-blue-200 group-hover:to-blue-300 transition-all duration-200">
+                        <span className="text-blue-800 font-semibold text-sm">
+                          {index + 1}
+                        </span>
+                      </div>
+                      <h3 className="text-slate-800 font-semibold text-lg tracking-tight">
+                        {name}
+                      </h3>
                     </div>
-                    <h3 className="text-slate-800 font-medium text-lg">
-                      {chhanda}
-                    </h3>
-                  </div>
 
-                  {chhandasDescriptions[chhanda] && (
-                    <p className="text-slate-500 text-sm leading-relaxed pl-11">
-                      {chhandasDescriptions[chhanda]}
-                    </p>
-                  )}
-                </div>
-              ))}
+                    <div className="bg-slate-50/80 rounded-lg p-4 border border-slate-100">
+                      <div className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">
+                        गण अनुक्रम (Pattern)
+                      </div>
+                      <div className="text-slate-700 font-mono text-sm leading-relaxed">
+                        {pattern.length ? pattern.join(" • ") : "विशेष नियम"}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 

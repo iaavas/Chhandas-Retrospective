@@ -87,20 +87,20 @@ export const GANAS: Record<string, string> = {
 };
 
 export const CHHANDAS: Record<string, string[]> = {
-  Bhujangaprayata: ["ISS", "ISS", "ISS", "ISS"],
-  Shardulavikridita: ["SSS", "IIS", "ISI", "IIS", "SSI", "SSI", "S"],
-  Totaka: ["IIS", "IIS", "IIS", "IIS"],
-  Mandakranta: ["SSS", "SII", "III", "SSI", "SSI", "S", "S"],
-  Indravajra: ["SSI", "SSI", "ISI", "SS"],
-  Upendravajra: ["ISI", "SSI", "ISI", "SS"],
-  Vanshastha: ["ISI", "SSI", "ISI", "SIS"],
-  Indravamsha: ["SSI", "SSI", "ISI", "SIS"],
-  Vasantatilaka: ["SSI", "SII", "ISI", "ISI", "SS"],
-  Malini: ["III", "III", "SSS", "ISS", "ISS"],
-  Shikarini: ["ISS", "SSS", "III", "IIS", "SII", "I", "S"],
-  Sragvini: ["SIS", "SIS", "SIS", "SIS"],
-  Sragdhara: ["SSS", "SIS", "SII", "III", "ISS", "ISS", "ISS"],
-  Prithvi: [
+  भुजङ्गप्रयात: ["ISS", "ISS", "ISS", "ISS"],
+  शार्दूलविक्रीडित: ["SSS", "IIS", "ISI", "IIS", "SSI", "SSI", "S"],
+  तोटक: ["IIS", "IIS", "IIS", "IIS"],
+  मन्दाक्रान्ता: ["SSS", "SII", "III", "SSI", "SSI", "S", "S"],
+  इन्द्रवज्र: ["SSI", "SSI", "ISI", "SS"],
+  उपेन्द्रवज्र: ["ISI", "SSI", "ISI", "SS"],
+  वंशस्थ: ["ISI", "SSI", "ISI", "SIS"],
+  इन्द्रवंश: ["SSI", "SSI", "ISI", "SIS"],
+  वसन्ततिलका: ["SSI", "SII", "ISI", "ISI", "SS"],
+  मालिनी: ["III", "III", "SSS", "ISS", "ISS"],
+  शिखरिणी: ["ISS", "SSS", "III", "IIS", "SII", "I", "S"],
+  स्रग्विणी: ["SIS", "SIS", "SIS", "SIS"],
+  स्रग्धरा: ["SSS", "SIS", "SII", "III", "ISS", "ISS", "ISS"],
+  पृथ्वी: [
     "III",
     "III",
     "SSS",
@@ -112,11 +112,11 @@ export const CHHANDAS: Record<string, string[]> = {
     "ISS",
     "ISS",
   ],
-  Drutavilambita: ["III", "SII", "SII", "SIS"],
-  Harini: ["III", "IIS", "SSS", "SIS", "IIS", "IS"],
+  द्रुतविलम्बित: ["III", "SII", "SII", "SIS"],
+  हरिणी: ["III", "IIS", "SSS", "SIS", "IIS", "IS"],
   // गीतिक छन्दहरू
-  Anushtup: [], // विशेष नियम छ
+  अनुष्टुप्: [], // विशेष नियम छ
   // मात्रिक छन्दहरू
-  Matrik14: [], // १४ मात्रा
-  Arya: [], // आर्या छन्द - विशेष मात्रिक नियम
+  मात्रिक१४: [], // १४ मात्रा
+  आर्या: [], // आर्या छन्द - विशेष मात्रिक नियम
 };

@@ -2,13 +2,12 @@ import { CHHANDAS } from "./constant";
 
 export type SYLLABLE = "S" | "I";
 
-const VIRAMA = "\u094D"; // halant
+const VIRAMA = "\u094D";
 const NUKTA = "\u093C";
-const ANUSVARA = "\u0902"; // ं
-const CHANDRA_BINDU = "\u0901"; // ँ
-const VISARGA = "\u0903"; // ः
+const ANUSVARA = "\u0902";
+const CHANDRA_BINDU = "\u0901";
+const VISARGA = "\u0903";
 
-// independent vowels (short/long)
 const INDEPENDENT_LONG = new Set([
   "\u0906",
   "\u0908",
@@ -17,10 +16,9 @@ const INDEPENDENT_LONG = new Set([
   "\u0910",
   "\u0913",
   "\u0914",
-]); // आ, ई, ऊ, ए, ऐ, ओ, औ
-const INDEPENDENT_SHORT = new Set(["\u0905", "\u0907", "\u0909", "\u090B"]); // अ, इ, उ, ऋ(approx)
+]);
+const INDEPENDENT_SHORT = new Set(["\u0905", "\u0907", "\u0909", "\u090B"]);
 
-// matras / dependent vowel signs
 const MATRA_LONG = new Set([
   "\u093E",
   "\u0940",
@@ -31,28 +29,24 @@ const MATRA_LONG = new Set([
   "\u094C",
   "\u0962",
   "\u0963",
-]); // ा, ी, ू, े, ै, ो, ौ, vocalic signs
-const MATRA_SHORT = new Set(["\u093F", "\u0941", "\u0943"]); // ि,ु,ृ (treated short)
+]);
+const MATRA_SHORT = new Set(["\u093F", "\u0941", "\u0943"]);
 
 const DIACRITICS = new Set([ANUSVARA, CHANDRA_BINDU, VISARGA]);
 
-// Character classes (Devanagari ranges)
-const consonantRe = /[\u0915-\u0939\u0958-\u095F]/u; // common consonants
+const consonantRe = /[\u0915-\u0939\u0958-\u095F]/u;
 const independentVowelRe = /[\u0904-\u0914\u0960-\u0963]/u;
 const matraRe =
   /[\u093E-\u094C\u0962\u0963\u093F\u0940\u0941\u0942\u0943\u0947\u0948\u094B\u094C]/u;
 
-// Split text into akshara-like tokens using a regex that groups:
-//  - independent vowels OR
-//  - consonant (+ optional nukta) ( + \u094D consonant ... )*  + optional matra + optional diacritics
 const aksharaRegex = new RegExp(
   "(?:" +
-    "[\\u0904-\\u0914\\u0960-\\u0963]" + // independent vowels
+    "[\\u0904-\\u0914\\u0960-\\u0963]" +
     "|" +
-    "[\\u0915-\\u0939\\u0958-\\u095F](?:\\u093C)?" + // consonant + optional nukta
-    "(?:\\u094D[\\u0915-\\u0939\\u0958-\\u095F](?:\\u093C)?)*" + // conjuncts
-    "(?:[\\u093E-\\u094C\\u0962\\u0963\\u093F\\u0940\\u0941\\u0942\\u0943\\u0947\\u0948\\u094B\\u094C])?" + // optional matra (0 or 1)
-    "(?:[\\u0901-\\u0903\\u0951-\\u0954])?" + // optional diacritic
+    "[\\u0915-\\u0939\\u0958-\\u095F](?:\\u093C)?" +
+    "(?:\\u094D[\\u0915-\\u0939\\u0958-\\u095F](?:\\u093C)?)*" +
+    "(?:[\\u093E-\\u094C\\u0962\\u0963\\u093F\\u0940\\u0941\\u0942\\u0943\\u0947\\u0948\\u094B\\u094C])?" +
+    "(?:[\\u0901-\\u0903\\u0951-\\u0954])?" +
     ")",
   "gu"
 );
@@ -60,7 +54,7 @@ const aksharaRegex = new RegExp(
 export function splitAksharas(text: string): string[] {
   const norm = text.normalize("NFC");
   const matches = [...norm.matchAll(aksharaRegex)].map((m) => m[0]);
-  return matches.length ? matches : Array.from(norm); // fallback: characters
+  return matches.length ? matches : Array.from(norm);
 }
 
 function containsAny(str: string, set: Set<string>): boolean {
@@ -77,36 +71,22 @@ function isIndependentShortVowel(ch: string): boolean {
 }
 
 function leadingConsonantCount(token: string): number {
-  // count consonants at the start of token before any matra/diacritic
   let count = 0;
   for (let i = 0; i < token.length; i++) {
     const ch = token[i];
     if (consonantRe.test(ch)) {
       count++;
-      // skip optional nukta
       if (token[i + 1] === NUKTA) i++;
-      // if next is virama, skip it and continue to the next consonant
-      if (token[i + 1] === VIRAMA) i += 1; // loop will advance 1 more
+      if (token[i + 1] === VIRAMA) i += 1;
       continue;
     }
-    // stop on vowel signs or diacritics
     if (matraRe.test(ch) || DIACRITICS.has(ch) || ch === VIRAMA) break;
-    // anything else break
     break;
   }
   return count;
 }
 
-export function detectSyllables(text: string): SYLLABLE[] {
-  // Strategy:
-  // 1. Normalize and split into akshara-like tokens
-  // 2. For each token decide Laghu (I) or Guru (S) using rules:
-  //    - long independent vowel or long matra -> Guru
-  //    - anusvara/visarga/chandrabindu present -> Guru
-  //    - short vowel but next token has 2+ leading consonants -> Guru
-  //    - final token in the whole input -> Guru
-  //    - otherwise Laghu
-
+function detectSyllables(text: string): SYLLABLE[] {
   const norm = text.normalize("NFC");
   const tokens = splitAksharas(norm);
   const weights: SYLLABLE[] = [];
@@ -115,44 +95,33 @@ export function detectSyllables(text: string): SYLLABLE[] {
     const token = tokens[ti];
     let isGuru = false;
 
-    // 1) independent vowels
     if (token.length === 1 && independentVowelRe.test(token)) {
       const ch = token;
       if (isIndependentLongVowel(ch)) isGuru = true;
-      else if (isIndependentShortVowel(ch)) isGuru = false; // short
-      else isGuru = false; // fallback
+      else if (isIndependentShortVowel(ch)) isGuru = false;
+      else isGuru = false;
     }
 
-    // 2) long matra inside token
     if (!isGuru && containsAny(token, MATRA_LONG)) isGuru = true;
-
-    // 3) diacritics like anusvara, visarga, chandrabindu -> guru
     if (!isGuru && containsAny(token, DIACRITICS)) isGuru = true;
-
-    // 4) If token ends with VIRAMA (dead consonant) — rare as a standalone syllable — treat
-    //    conservatively as Guru because phonetic weight increases.
     if (!isGuru && token.endsWith(VIRAMA)) isGuru = true;
 
-    // 5) If token has only short matra or no matra (inherent 'a'), it's potentially Laghu
     let maybeShort = false;
     if (!isGuru) {
       if (containsAny(token, MATRA_SHORT)) maybeShort = true;
       else if (!matraRe.test(token) && consonantRe.test(token[0])) {
-        // consonant without matra -> inherent short 'a'
         maybeShort = true;
       }
     }
 
-    // 6) Short vowel + next token starts with 2+ leading consonants -> make it Guru
     if (maybeShort) {
       const next = tokens[ti + 1];
       if (next) {
         const leadCons = leadingConsonantCount(next);
-        if (leadCons >= 2) isGuru = true; // consonant cluster pulls previous into guru
+        if (leadCons >= 2) isGuru = true;
       }
     }
 
-    // 7) Final token is always Guru (per the source text)
     if (ti === tokens.length - 1) isGuru = true;
 
     weights.push(isGuru ? "S" : "I");
@@ -161,16 +130,16 @@ export function detectSyllables(text: string): SYLLABLE[] {
   return weights;
 }
 
-export function toGanas(seq: SYLLABLE[]): string[] {
+function toGanas(seq: SYLLABLE[]): string[] {
   const result: string[] = [];
   for (let i = 0; i < seq.length; i += 3) {
     const chunk = seq.slice(i, i + 3).join("");
-    if (chunk.length > 0) result.push(chunk); // keep even incomplete/trailing chunks
+    if (chunk.length > 0) result.push(chunk);
   }
   return result;
 }
 
-export function detectChhanda(ganaSeq: string[]): string | null {
+function detectChhanda(ganaSeq: string[]): string | null {
   for (const [name, pattern] of Object.entries(CHHANDAS)) {
     if (
       pattern.join("").replace(/-/g, "") === ganaSeq.join("").replace(/-/g, "")
@@ -178,4 +147,30 @@ export function detectChhanda(ganaSeq: string[]): string | null {
       return name;
   }
   return null;
+}
+
+export function processStanza(text: string) {
+  const lines = text
+    .trim()
+    .split("\n")
+    .filter((line) => line.trim());
+  const results = lines.map((line) => {
+    const syllables = detectSyllables(line.trim());
+    const ganaSeq = toGanas(syllables);
+    const chhanda = detectChhanda(ganaSeq);
+    return {
+      line: line.trim(),
+      syllables,
+      ganaSeq,
+      chhanda,
+    };
+  });
+
+  const chhandas = results.map((r) => r.chhanda).filter(Boolean);
+  const overallChhanda =
+    chhandas.length > 0 && chhandas.every((c) => c === chhandas[0])
+      ? chhandas[0]
+      : null;
+
+  return { results, overallChhanda };
 }
