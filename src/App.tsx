@@ -24,7 +24,7 @@ function Home() {
 
   return (
     <main className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-white to-slate-100 pt-24">
-      <div className="container max-w-4xl mx-auto px-6 py-16">
+      <div className="container max-w-6xl mx-auto px-6 py-16">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-light text-slate-800 mb-3 tracking-tight">
@@ -37,6 +37,20 @@ function Home() {
         </div>
 
         {/* Input Section */}
+        <div className=" rounded-2xl  p-3 text-center my-4">
+          {output?.overallChhanda ? (
+            <div className="  rounded-2xl flex items-center gap-2 justify-center">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span className="text-slate-700 italic font-bold text-5xl ">
+                {output?.overallChhanda}
+              </span>
+            </div>
+          ) : (
+            <div className="inline-block">
+              <span>एकरूप छन्द फेला परेन</span>
+            </div>
+          )}
+        </div>
         <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200/50 shadow-xl shadow-slate-200/20 p-8 mb-8">
           <div className="space-y-6">
             <div className="relative">
@@ -73,103 +87,117 @@ function Home() {
         {output && (
           <div className="space-y-6 animate-in fade-in duration-300">
             {/* Main Chhanda Result - FIRST */}
-            <div className="bg-gradient-to-r from-emerald-50 to-blue-50 rounded-2xl border border-emerald-200/50 shadow-lg p-8 text-center">
-              <div className="space-y-4">
-                <div className="flex justify-center items-center gap-3">
-                  <div
-                    className={`w-4 h-4 rounded-full ${
-                      output.overallChhanda ? "bg-emerald-500" : "bg-amber-500"
-                    }`}
-                  ></div>
-                  <h2 className="text-slate-700 font-semibold text-2xl">
-                    पहिचान गरिएको छन्द
-                  </h2>
-                </div>
-
-                {output.overallChhanda ? (
-                  <div className="inline-block px-8 py-4 bg-emerald-100 border-2 border-emerald-300 rounded-2xl shadow-sm">
-                    <span className="text-emerald-900 font-bold text-3xl">
-                      {output.overallChhanda}
-                    </span>
-                  </div>
-                ) : (
-                  <div className="inline-block px-8 py-4 bg-amber-100 border-2 border-amber-300 rounded-2xl shadow-sm">
-                    <span className="text-amber-900 font-semibold text-xl">
-                      एकरूप छन्द फेला परेन
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
 
             {/* Line by Line Analysis */}
-            <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200/50 shadow-lg p-6">
+            <div className="bg-white/70  rounded-2xl border border-slate-200/50  p-6">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-3 h-3 bg-indigo-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-slate-500 rounded-full"></div>
                 <h3 className="text-slate-700 font-semibold text-xl">
                   हरफ अनुसार विश्लेषण
                 </h3>
               </div>
 
-              <div className="space-y-8">
+              <div className="space-y-32">
                 {output.results.map((result, lineIndex) => (
                   <div
                     key={lineIndex}
-                    className="border-l-4 border-indigo-200 pl-6 space-y-4"
+                    className="border-l-2  border-slate-200 pl-6 space-y-4"
                   >
                     {/* Line Text */}
-                    <div className="bg-indigo-50 rounded-lg p-4">
-                      <h4 className="text-indigo-800 font-medium text-lg mb-2">
-                        हरफ {lineIndex + 1}:
-                      </h4>
-                      <p className="text-indigo-900 text-xl font-medium">
-                        {result.line}
-                      </p>
+                    <div className="bg-slate-50/10 rounded-lg p-4 flex justify-between">
+                      <div>
+                        <h4 className="text-slate-800 font-medium text-lg mb-2">
+                          हरफ {lineIndex + 1}:
+                        </h4>
+                        <p className="text-slate-900 text-xl font-medium">
+                          {result.line}
+                        </p>
+                      </div>
                       {result.chhanda && (
                         <div className="mt-2">
-                          <span className="inline-block px-3 py-1 bg-indigo-200 text-indigo-800 rounded-full text-sm font-medium">
+                          <span className="inline-block px-3 py-1 bg-slate-200 text-slate-800 rounded-full text-sm font-medium">
                             {result.chhanda}
                           </span>
                         </div>
                       )}
                     </div>
 
-                    {/* Syllables for this line */}
+                    {/* Tabular Analysis */}
                     <div>
-                      <h5 className="text-slate-600 font-medium mb-2">
-                        अक्षरहरू:
+                      <h5 className="text-slate-600 font-medium mb-3">
+                        विश्लेषण तालिका:
                       </h5>
-                      <div className="flex flex-wrap gap-2">
-                        {splitAksharas(result.line).map((syllable, i) => (
-                          <span
-                            key={i}
-                            className={`px-3 py-1.5 rounded-lg text-sm font-medium border ${
-                              result.syllables[i] === "S"
-                                ? "bg-red-50 text-red-800 border-red-200"
-                                : "bg-blue-50 text-blue-800 border-blue-200"
-                            }`}
-                          >
-                            {syllable} (
-                            {result.syllables[i] === "S" ? "गुरु" : "लघु"})
-                          </span>
-                        ))}
-                      </div>
-                    </div>
+                      <div className="overflow-x-auto">
+                        <table className="w-full border-collapse">
+                          <tbody>
+                            {/* Aksharas Row */}
+                            <tr>
+                              <td className="text-slate-500 text-sm font-medium py-2 pr-4 border-r border-slate-200">
+                                अक्षर
+                              </td>
+                              {splitAksharas(result.line).map((syllable, i) => (
+                                <td
+                                  key={i}
+                                  className="px-2 py-2 text-center font-medium text-slate-800 border-r border-slate-100 last:border-r-0"
+                                >
+                                  {syllable}
+                                </td>
+                              ))}
+                            </tr>
 
-                    {/* Ganas for this line */}
-                    <div>
-                      <h5 className="text-slate-600 font-medium mb-2">
-                        गणहरू:
-                      </h5>
-                      <div className="flex flex-wrap gap-2">
-                        {result.ganaSeq.map((g, i) => (
-                          <span
-                            key={i}
-                            className="px-4 py-2 bg-purple-50 text-purple-800 rounded-xl font-mono text-sm border border-purple-200/50 shadow-sm"
-                          >
-                            {GANAS[g] || g}
-                          </span>
-                        ))}
+                            {/* Syllable Type Row */}
+                            <tr className="bg-slate-50/50">
+                              <td className="text-slate-500 text-sm font-medium py-2 pr-4 border-r border-slate-200">
+                                मात्रा
+                              </td>
+                              {result.syllables.map((syllable, i) => (
+                                <td
+                                  key={i}
+                                  className={`px-2 py-2 text-center text-sm font-medium border-r border-slate-100 last:border-r-0 ${
+                                    syllable === "S"
+                                      ? "text-red-700 bg-red-50/70"
+                                      : "text-blue-700 bg-blue-50/70"
+                                  }`}
+                                >
+                                  {syllable === "S" ? "गुरु" : "लघु"}
+                                </td>
+                              ))}
+                            </tr>
+
+                            {/* Gana Pattern Row */}
+                            <tr>
+                              <td className="text-slate-500 text-sm font-medium py-2 pr-4 border-r border-slate-200">
+                                गण
+                              </td>
+                              {result.syllables.map((_, i) => {
+                                const ganaIndex = Math.floor(i / 3);
+                                const positionInGana = i % 3;
+                                const gana = result.ganaSeq[ganaIndex];
+
+                                // Only show gana name in the middle cell of each group
+                                const showGanaName =
+                                  positionInGana === 1 && gana;
+
+                                return (
+                                  <td
+                                    key={i}
+                                    className={`px-2 py-2 text-center text-sm font-medium border-r border-slate-100 last:border-r-0 ${
+                                      positionInGana === 0
+                                        ? "border-l-2 border-l-slate-300"
+                                        : ""
+                                    } ${
+                                      ganaIndex % 2 === 0
+                                        ? "bg-purple-50/50 text-purple-800"
+                                        : "bg-indigo-50/50 text-indigo-800"
+                                    }`}
+                                  >
+                                    {showGanaName ? GANAS[gana] || gana : ""}
+                                  </td>
+                                );
+                              })}
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </div>
                   </div>

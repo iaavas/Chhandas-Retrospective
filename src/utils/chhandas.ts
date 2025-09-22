@@ -39,18 +39,22 @@ const independentVowelRe = /[\u0904-\u0914\u0960-\u0963]/u;
 const matraRe =
   /[\u093E-\u094C\u0962\u0963\u093F\u0940\u0941\u0942\u0943\u0947\u0948\u094B\u094C]/u;
 
+const matraRange = "[\\u093E-\\u094C\\u0962\\u0963]";
+
 const aksharaRegex = new RegExp(
   "(?:" +
     "[\\u0904-\\u0914\\u0960-\\u0963]" +
     "|" +
     "[\\u0915-\\u0939\\u0958-\\u095F](?:\\u093C)?" +
     "(?:\\u094D[\\u0915-\\u0939\\u0958-\\u095F](?:\\u093C)?)*" +
-    "(?:[\\u093E-\\u094C\\u0962\\u0963\\u093F\\u0940\\u0941\\u0942\\u0943\\u0947\\u0948\\u094B\\u094C])?" +
+    "(?:" +
+    matraRange +
+    ")*" + // Multiple matras allowed
+    "(?:\\u094D)?" + // Trailing virama
     "(?:[\\u0901-\\u0903\\u0951-\\u0954])?" +
     ")",
   "gu"
 );
-
 export function splitAksharas(text: string): string[] {
   const norm = text.normalize("NFC");
   const matches = [...norm.matchAll(aksharaRegex)].map((m) => m[0]);
