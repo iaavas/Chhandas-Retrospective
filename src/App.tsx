@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./Navbar";
 import About from "./About";
+import TestChhanda from "./TestChhanda";
 import { processStanza, splitAksharas } from "./utils/chhandas";
 import { GANAS, type SYLLABLE } from "./utils/constant";
 
@@ -47,7 +48,9 @@ function Home() {
             </div>
           ) : (
             <div className="inline-block">
-              <span>एकरूप छन्द फेला परेन</span>
+              <span className="text-slate-700 italic font-bold text-5xl ">
+                छन्द फेला परेन{" "}
+              </span>
             </div>
           )}
         </div>
@@ -236,6 +239,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
+        <Route path="/test" element={<TestChhanda />} />
       </Routes>
     </Router>
   );

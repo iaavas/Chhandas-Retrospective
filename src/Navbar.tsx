@@ -58,6 +58,20 @@ export default function Navbar() {
             </Link>
 
             <Link
+              to="/test"
+              className={`relative px-6 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${
+                location.pathname === "/test"
+                  ? "bg-slate-900 text-white shadow-lg shadow-slate-900/25"
+                  : "text-slate-600 hover:text-slate-800 hover:bg-slate-100/80"
+              }`}
+            >
+              <span className="relative z-10">परीक्षण</span>
+              {location.pathname === "/test" && (
+                <div className="absolute inset-0 bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl"></div>
+              )}
+            </Link>
+
+            <Link
               to="/about"
               className={`relative px-6 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${
                 location.pathname === "/about"
@@ -134,6 +148,17 @@ export default function Navbar() {
               }`}
             >
               गृहपृष्ठ
+            </Link>
+            <Link
+              to="/test"
+              onClick={closeMenu}
+              className={`block w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 ${
+                location.pathname === "/test"
+                  ? "bg-slate-900 text-white shadow-lg shadow-slate-900/25"
+                  : "text-slate-600 hover:text-slate-800 hover:bg-slate-100/80"
+              }`}
+            >
+              परीक्षण
             </Link>
             <Link
               to="/about"
