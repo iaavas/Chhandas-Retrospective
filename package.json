@@ -14,13 +14,17 @@
     "@vercel/analytics": "^1.5.0",
     "i18next": "^25.5.2",
     "i18next-browser-languagedetector": "^8.2.0",
+    "lucide-react": "^0.544.0",
+    "p5": "^2.0.5",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-i18next": "^15.7.3",
-    "react-router-dom": "^7.9.1"
+    "react-router-dom": "^7.9.1",
+    "tone": "^15.1.22"
   },
   "devDependencies": {
     "@eslint/js": "^9.35.0",
+    "@types/p5": "^1.7.6",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
     "@types/react-router-dom": "^5.3.3",

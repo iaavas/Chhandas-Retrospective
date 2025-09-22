@@ -203,5 +203,18 @@
     "colorLegend": "Color Legend",
     "ganas": "Ganas:",
     "matras": "Matras:"
+  },
+  "poetryVisualizer": {
+    "title": "Poetry Visualizer",
+    "subtitle": "Create artistic visualizations based on chhanda patterns",
+    "inputLabel": "Enter Poetry:",
+    "inputPlaceholder": "Write your poetry here...",
+    "analysis": "Analysis Results",
+    "visualization": "Visualization",
+    "noData": "Enter poetry to see visualization",
+    "patternDetails": "Pattern Details",
+    "stop": "Stop",
+    "animate": "Animate",
+    "download": "Download"
   }
 }

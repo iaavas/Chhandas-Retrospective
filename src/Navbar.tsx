@@ -204,21 +204,6 @@ export default function Navbar() {
                       {t("nav.comparison")}
                     </span>
                   </Link>
-                  <Link
-                    to="/visualizer"
-                    onClick={closeTools}
-                    className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors duration-200 ${
-                      location.pathname === "/visualizer"
-                        ? "bg-slate-100 text-slate-900"
-                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-800"
-                    }`}
-                  >
-                    <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
-                    <span>
-                      {currentLanguage === "ne" ? "गण" : "Gana"}{" "}
-                      {t("nav.visualizer")}
-                    </span>
-                  </Link>
                 </div>
               )}
             </div>
@@ -407,21 +392,6 @@ export default function Navbar() {
                   <span>
                     {currentLanguage === "ne" ? "छन्द" : "Chhanda"}{" "}
                     {t("nav.comparison")}
-                  </span>
-                </Link>
-                <Link
-                  to="/visualizer"
-                  onClick={closeMenu}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
-                    location.pathname === "/visualizer"
-                      ? "bg-slate-100 text-slate-900"
-                      : "text-slate-600 hover:bg-slate-50 hover:text-slate-800"
-                  }`}
-                >
-                  <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
-                  <span>
-                    {currentLanguage === "ne" ? "गण" : "Gana"}{" "}
-                    {t("nav.visualizer")}
                   </span>
                 </Link>
               </div>

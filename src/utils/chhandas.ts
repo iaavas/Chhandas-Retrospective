@@ -143,7 +143,7 @@ function toGanas(seq: SYLLABLE[]): string[] {
   return result;
 }
 
-function detectChhanda(ganaSeq: string[]): string | null {
+export function detectChhanda(ganaSeq: string[]): string | null {
   for (const [name, pattern] of Object.entries(CHHANDAS)) {
     if (
       pattern.join("").replace(/-/g, "") === ganaSeq.join("").replace(/-/g, "")

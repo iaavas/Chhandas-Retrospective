@@ -9,7 +9,6 @@ import SyllableCounter from "./SyllableCounter";
 import ChhandaQuiz from "./ChhandaQuiz";
 import PoetryAssistant from "./PoetryAssistant";
 import ChhandaComparison from "./ChhandaComparison";
-import GanaVisualizer from "./GanaVisualizer";
 import { processStanza, splitAksharas } from "./utils/chhandas";
 import { GANAS, type SYLLABLE } from "./utils/constant";
 import { useLanguage } from "./contexts/LanguageContext";
@@ -256,7 +255,6 @@ export default function App() {
           <Route path="/quiz" element={<ChhandaQuiz />} />
           <Route path="/poetry-assistant" element={<PoetryAssistant />} />
           <Route path="/comparison" element={<ChhandaComparison />} />
-          <Route path="/visualizer" element={<GanaVisualizer />} />
         </Routes>
       </Router>
     </LanguageProvider>
