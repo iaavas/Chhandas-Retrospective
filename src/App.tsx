@@ -1,12 +1,21 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { LanguageProvider } from "./contexts/LanguageContext";
 import Navbar from "./Navbar";
 import About from "./About";
 import TestChhanda from "./TestChhanda";
+import ChhandaPatternGenerator from "./ChhandaPatternGenerator";
+import SyllableCounter from "./SyllableCounter";
+import ChhandaQuiz from "./ChhandaQuiz";
+import PoetryAssistant from "./PoetryAssistant";
+import ChhandaComparison from "./ChhandaComparison";
+import GanaVisualizer from "./GanaVisualizer";
 import { processStanza, splitAksharas } from "./utils/chhandas";
 import { GANAS, type SYLLABLE } from "./utils/constant";
+import { useLanguage } from "./contexts/LanguageContext";
 
 function Home() {
+  const { t } = useLanguage();
   const [input, setInput] = React.useState("");
   const [output, setOutput] = React.useState<{
     results: Array<{
@@ -29,27 +38,23 @@ function Home() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-light text-slate-800 mb-3 tracking-tight">
-            छन्द Retrospective
+            {t("home.title")}
           </h1>
           <p className="text-slate-500 text-lg font-light">
-            Nepali Chhanda Checker
+            {t("home.subtitle")}
           </p>
           <div className="w-24 h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent mx-auto mt-6"></div>
         </div>
 
         {/* Input Section */}
         <div className=" rounded-2xl  p-3 text-center my-4">
-          {output?.overallChhanda ? (
+          {output?.overallChhanda && (
             <div className="  rounded-2xl flex items-center gap-2 justify-center">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
               <span className="text-slate-700 italic font-bold text-5xl ">
-                {output?.overallChhanda}
-              </span>
-            </div>
-          ) : (
-            <div className="inline-block">
-              <span className="text-slate-700 italic font-bold text-5xl ">
-                छन्द फेला परेन{" "}
+                {output.overallChhanda
+                  ? output.overallChhanda
+                  : "एकरूप छन्द फेला परेन"}
               </span>
             </div>
           )}
@@ -62,7 +67,7 @@ function Home() {
                 rows={6}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="यहाँ आफ्नो कविता वा श्लोक लेख्नुहोस्... (प्रत्येक हरफ नयाँ लाइनमा)"
+                placeholder={t("home.placeholder")}
               />
             </div>
 
@@ -80,7 +85,7 @@ function Home() {
                   }
                 `}
               >
-                विश्लेषण गर्नुहोस्
+                {t("common.analyze")}
               </button>
             </div>
           </div>
@@ -96,7 +101,7 @@ function Home() {
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-3 h-3 bg-slate-500 rounded-full"></div>
                 <h3 className="text-slate-700 font-semibold text-xl">
-                  हरफ अनुसार विश्लेषण
+                  {t("home.lineAnalysis")}
                 </h3>
               </div>
 
@@ -110,7 +115,7 @@ function Home() {
                     <div className="bg-slate-50/10 rounded-lg p-4 flex justify-between">
                       <div>
                         <h4 className="text-slate-800 font-medium text-lg mb-2">
-                          हरफ {lineIndex + 1}:
+                          {t("common.line")} {lineIndex + 1}:
                         </h4>
                         <p className="text-slate-900 text-xl font-medium">
                           {result.line}
@@ -128,7 +133,7 @@ function Home() {
                     {/* Tabular Analysis */}
                     <div>
                       <h5 className="text-slate-600 font-medium mb-3">
-                        विश्लेषण तालिका:
+                        {t("home.analysisTable")}
                       </h5>
                       <div className="overflow-x-auto">
                         <table className="w-full border-collapse">
@@ -136,7 +141,7 @@ function Home() {
                             {/* Aksharas Row */}
                             <tr>
                               <td className="text-slate-500 text-sm font-medium py-2 pr-4 border-r border-slate-200">
-                                अक्षर
+                                {t("home.akshara")}
                               </td>
                               {splitAksharas(result.line).map((syllable, i) => (
                                 <td
@@ -151,7 +156,7 @@ function Home() {
                             {/* Syllable Type Row */}
                             <tr className="bg-slate-50/50">
                               <td className="text-slate-500 text-sm font-medium py-2 pr-4 border-r border-slate-200">
-                                मात्रा
+                                {t("common.matra")}
                               </td>
                               {result.syllables.map((syllable, i) => (
                                 <td
@@ -162,7 +167,9 @@ function Home() {
                                       : "text-blue-700 bg-blue-50/70"
                                   }`}
                                 >
-                                  {syllable === "S" ? "गुरु" : "लघु"}
+                                  {syllable === "S"
+                                    ? t("common.guru")
+                                    : t("common.laghu")}
                                 </td>
                               ))}
                             </tr>
@@ -170,7 +177,7 @@ function Home() {
                             {/* Gana Pattern Row */}
                             <tr>
                               <td className="text-slate-500 text-sm font-medium py-2 pr-4 border-r border-slate-200">
-                                गण
+                                {t("home.gana")}
                               </td>
                               {result.syllables.map((_, i) => {
                                 const ganaIndex = Math.floor(i / 3);
@@ -234,13 +241,24 @@ function Home() {
 
 export default function App() {
   return (
-    <Router>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/test" element={<TestChhanda />} />
-      </Routes>
-    </Router>
+    <LanguageProvider>
+      <Router>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/test" element={<TestChhanda />} />
+          <Route
+            path="/pattern-generator"
+            element={<ChhandaPatternGenerator />}
+          />
+          <Route path="/syllable-counter" element={<SyllableCounter />} />
+          <Route path="/quiz" element={<ChhandaQuiz />} />
+          <Route path="/poetry-assistant" element={<PoetryAssistant />} />
+          <Route path="/comparison" element={<ChhandaComparison />} />
+          <Route path="/visualizer" element={<GanaVisualizer />} />
+        </Routes>
+      </Router>
+    </LanguageProvider>
   );
 }

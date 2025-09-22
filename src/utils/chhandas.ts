@@ -90,7 +90,7 @@ function leadingConsonantCount(token: string): number {
   return count;
 }
 
-function detectSyllables(text: string): SYLLABLE[] {
+export function detectSyllables(text: string): SYLLABLE[] {
   const norm = text.normalize("NFC");
   const tokens = splitAksharas(norm);
   const weights: SYLLABLE[] = [];
