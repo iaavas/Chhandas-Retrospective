@@ -43,214 +43,163 @@ function Home() {
     : output?.overallChhanda;
 
   return (
-    <main className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-white to-slate-100 pt-24">
+    <main className="min-h-screen w-full bg-white pt-20">
       <SEO {...pageSEO.home} />
-      <div className="container max-w-6xl mx-auto px-6 py-16">
+      <div className="max-w-3xl mx-auto px-4 py-12">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-light text-slate-800 mb-3 tracking-tight">
+        <div className="mb-10">
+          <h1 className="text-3xl font-normal text-slate-900 mb-2">
             {t("home.title")}
           </h1>
-          <p className="text-slate-500 text-lg font-light">
-            {t("home.subtitle")}
-          </p>
-          <div className="w-24 h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent mx-auto mt-6"></div>
+          <p className="text-slate-500">{t("home.subtitle")}</p>
         </div>
+
+        {/* Detected Chhanda */}
+        {detectedChhanda && (
+          <div className="mb-10 py-8 text-center bg-slate-50 -mx-4 px-4">
+            <span className="text-xs text-slate-400 uppercase tracking-wider block mb-2">
+              छन्द
+            </span>
+            <span className="text-slate-900 text-4xl">{detectedChhanda}</span>
+            {output?.anustubhResult?.isAnustubh && (
+              <span className="block text-sm text-slate-400 mt-2">
+                {output.anustubhResult.confidence}%
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Input Section */}
-        <div className=" rounded-2xl  p-3 text-center my-4">
-          {detectedChhanda && (
-            <div className="  rounded-2xl flex items-center gap-2 justify-center">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-slate-700 italic font-bold text-5xl ">
-                {detectedChhanda}
-              </span>
-            </div>
-          )}
-          {output?.anustubhResult?.isAnustubh && (
-            <div className="mt-2 text-sm text-slate-500">
-              ({output.anustubhResult.confidence}% विश्वास •{" "}
-              {output.anustubhResult.inputFormat === "2-line"
-                ? "२-पंक्ति"
-                : "४-पंक्ति"}{" "}
-              ढाँचा)
-            </div>
-          )}
-        </div>
-        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200/50 shadow-xl shadow-slate-200/20 p-8 mb-8">
-          <div className="space-y-6">
-            <div className="relative">
-              <textarea
-                className="w-full p-6 bg-slate-50/50 border-0 rounded-xl text-slate-700 placeholder-slate-400 text-lg leading-relaxed focus:outline-none focus:ring-2 focus:ring-slate-300/50 focus:bg-white/80 transition-all duration-200 resize-none"
-                rows={6}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder={t("home.placeholder")}
-              />
-            </div>
-
-            <div className="flex justify-center">
-              <button
-                onClick={handleCheck}
-                disabled={!input.trim()}
-                className={`
-                  px-8 py-3 rounded-xl font-medium text-base
-                  transition-all duration-200
-                  ${
-                    !input.trim()
-                      ? "bg-slate-300 text-slate-500 cursor-not-allowed"
-                      : "bg-slate-900 text-white hover:bg-slate-800 hover:shadow-lg shadow-slate-900/25"
-                  }
-                `}
-              >
-                {t("common.analyze")}
-              </button>
-            </div>
-          </div>
+        <div className="mb-8">
+          <textarea
+            className="w-full p-4 border border-slate-200 rounded text-slate-800 placeholder-slate-400 text-lg leading-relaxed focus:outline-none focus:border-slate-400 resize-none"
+            rows={5}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder={t("home.placeholder")}
+          />
+          <button
+            onClick={handleCheck}
+            disabled={!input.trim()}
+            className={`mt-4 px-6 py-2.5 rounded font-medium ${
+              !input.trim()
+                ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                : "bg-slate-900 text-white hover:bg-slate-800"
+            }`}
+          >
+            {t("common.analyze")}
+          </button>
         </div>
 
         {/* Results Section */}
         {output && (
-          <div className="space-y-6 animate-in fade-in duration-300">
-            {/* Main Chhanda Result - FIRST */}
+          <div className="space-y-8">
+            <h3 className="text-lg font-medium text-slate-800 border-b border-slate-200 pb-2">
+              {t("home.lineAnalysis")}
+            </h3>
 
-            {/* Line by Line Analysis */}
-            <div className="bg-white/70  rounded-2xl border border-slate-200/50  p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-3 h-3 bg-slate-500 rounded-full"></div>
-                <h3 className="text-slate-700 font-semibold text-xl">
-                  {t("home.lineAnalysis")}
-                </h3>
-              </div>
-
-              <div className="space-y-32">
-                {output.results.map((result, lineIndex) => (
-                  <div
-                    key={lineIndex}
-                    className="border-l-2  border-slate-200 pl-6 space-y-4"
-                  >
-                    {/* Line Text */}
-                    <div className="bg-slate-50/10 rounded-lg p-4 flex justify-between">
-                      <div>
-                        <h4 className="text-slate-800 font-medium text-lg mb-2">
-                          {t("common.line")} {lineIndex + 1}:
-                        </h4>
-                        <p className="text-slate-900 text-xl font-medium">
-                          {result.line}
-                        </p>
-                      </div>
-                      {result.chhanda && (
-                        <div className="mt-2">
-                          <span className="inline-block px-3 py-1 bg-slate-200 text-slate-800 rounded-full text-sm font-medium">
-                            {result.chhanda}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Tabular Analysis */}
+            <div className="space-y-10">
+              {output.results.map((result, lineIndex) => (
+                <div key={lineIndex} className="space-y-4">
+                  {/* Line Text */}
+                  <div className="flex justify-between items-start">
                     <div>
-                      <h5 className="text-slate-600 font-medium mb-3">
-                        {t("home.analysisTable")}
-                      </h5>
-                      <div className="overflow-x-auto">
-                        <table className="w-full border-collapse">
-                          <tbody>
-                            {/* Aksharas Row */}
-                            <tr>
-                              <td className="text-slate-500 text-sm font-medium py-2 pr-4 border-r border-slate-200">
-                                {t("home.akshara")}
-                              </td>
-                              {splitAksharas(result.line).map((syllable, i) => (
-                                <td
-                                  key={i}
-                                  className="px-2 py-2 text-center font-medium text-slate-800 border-r border-slate-100 last:border-r-0"
-                                >
-                                  {syllable}
-                                </td>
-                              ))}
-                            </tr>
-
-                            {/* Syllable Type Row */}
-                            <tr className="bg-slate-50/50">
-                              <td className="text-slate-500 text-sm font-medium py-2 pr-4 border-r border-slate-200">
-                                {t("common.matra")}
-                              </td>
-                              {result.syllables.map((syllable, i) => (
-                                <td
-                                  key={i}
-                                  className={`px-2 py-2 text-center text-sm font-medium border-r border-slate-100 last:border-r-0 ${
-                                    syllable === "S"
-                                      ? "text-red-700 bg-red-50/70"
-                                      : "text-blue-700 bg-blue-50/70"
-                                  }`}
-                                >
-                                  {syllable === "S"
-                                    ? t("common.guru")
-                                    : t("common.laghu")}
-                                </td>
-                              ))}
-                            </tr>
-
-                            {/* Gana Pattern Row */}
-                            <tr>
-                              <td className="text-slate-500 text-sm font-medium py-2 pr-4 border-r border-slate-200">
-                                {t("home.gana")}
-                              </td>
-                              {result.syllables.map((_, i) => {
-                                const ganaIndex = Math.floor(i / 3);
-                                const positionInGana = i % 3;
-                                const gana = result.ganaSeq[ganaIndex];
-
-                                // Only show gana name in the middle cell of each group
-                                const showGanaName =
-                                  positionInGana === 1 && gana;
-
-                                return (
-                                  <td
-                                    key={i}
-                                    className={`px-2 py-2 text-center text-sm font-medium border-r border-slate-100 last:border-r-0 ${
-                                      positionInGana === 0
-                                        ? "border-l-2 border-l-slate-300"
-                                        : ""
-                                    } ${
-                                      ganaIndex % 2 === 0
-                                        ? "bg-purple-50/50 text-purple-800"
-                                        : "bg-indigo-50/50 text-indigo-800"
-                                    }`}
-                                  >
-                                    {showGanaName ? GANAS[gana] || gana : ""}
-                                  </td>
-                                );
-                              })}
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
+                      <span className="text-sm text-slate-500">
+                        {t("common.line")} {lineIndex + 1}
+                      </span>
+                      <p className="text-slate-900 text-xl mt-1">
+                        {result.line}
+                      </p>
                     </div>
+                    {result.chhanda && (
+                      <span className="text-sm text-slate-600 bg-slate-100 px-2 py-1 rounded">
+                        {result.chhanda}
+                      </span>
+                    )}
                   </div>
-                ))}
-              </div>
+
+                  {/* Tabular Analysis */}
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <tbody>
+                        {/* Aksharas Row */}
+                        <tr className="border-b border-slate-100">
+                          <td className="text-slate-500 py-2 pr-4 w-20">
+                            {t("home.akshara")}
+                          </td>
+                          {splitAksharas(result.line).map((syllable, i) => (
+                            <td
+                              key={i}
+                              className="px-2 py-2 text-center text-slate-800"
+                            >
+                              {syllable}
+                            </td>
+                          ))}
+                        </tr>
+
+                        {/* Syllable Type Row */}
+                        <tr className="border-b border-slate-100">
+                          <td className="text-slate-500 py-2 pr-4">
+                            {t("common.matra")}
+                          </td>
+                          {result.syllables.map((syllable, i) => (
+                            <td
+                              key={i}
+                              className={`px-2 py-2 text-center ${
+                                syllable === "S"
+                                  ? "text-red-600"
+                                  : "text-blue-600"
+                              }`}
+                            >
+                              {syllable === "S"
+                                ? t("common.guru")
+                                : t("common.laghu")}
+                            </td>
+                          ))}
+                        </tr>
+
+                        {/* Gana Pattern Row */}
+                        <tr>
+                          <td className="text-slate-500 py-2 pr-4">
+                            {t("home.gana")}
+                          </td>
+                          {result.syllables.map((_, i) => {
+                            const ganaIndex = Math.floor(i / 3);
+                            const positionInGana = i % 3;
+                            const gana = result.ganaSeq[ganaIndex];
+                            const showGanaName = positionInGana === 1 && gana;
+
+                            return (
+                              <td
+                                key={i}
+                                className={`px-2 py-2 text-center text-slate-700 ${
+                                  positionInGana === 0
+                                    ? "border-l border-slate-200"
+                                    : ""
+                                }`}
+                              >
+                                {showGanaName ? GANAS[gana] || gana : ""}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
 
-        <footer className="text-center mt-12">
-          <div className="w-24 h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent mx-auto mt-6"></div>
-          <p className="text-lg font-light text-slate-800 mb-3 mt-6">
-            Designed by{" "}
-            <a
-              href="https://www.linkedin.com/in/aavashbaral/"
-              className="text-black tracking-tight decoration-1 decoration-black/40 underline underline-offset-4"
-              style={{
-                textUnderlineOffset: 4,
-                color: "#1e293b",
-                textDecoration: "underline",
-              }}
-            >
-              आभाष बराल
-            </a>
-          </p>
+        <footer className="mt-16 pt-6 border-t border-slate-200 text-center text-slate-500 text-sm">
+          Designed by{" "}
+          <a
+            href="https://www.linkedin.com/in/aavashbaral/"
+            className="text-slate-700 underline underline-offset-2"
+          >
+            आभाष बराल
+          </a>
         </footer>
       </div>
     </main>
