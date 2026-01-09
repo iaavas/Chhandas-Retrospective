@@ -9,7 +9,11 @@ import SyllableCounter from "./SyllableCounter";
 import ChhandaQuiz from "./ChhandaQuiz";
 import PoetryAssistant from "./PoetryAssistant";
 import ChhandaComparison from "./ChhandaComparison";
-import { processStanza, splitAksharas } from "./utils/chhandas";
+import {
+  processStanza,
+  splitAksharas,
+  type AnustubhResult,
+} from "./utils/chhandas";
 import { GANAS, type SYLLABLE } from "./utils/constant";
 import { useLanguage } from "./contexts/LanguageContext";
 
@@ -24,12 +28,18 @@ function Home() {
       chhanda: string | null;
     }>;
     overallChhanda: string | null;
+    anustubhResult: AnustubhResult;
   } | null>(null);
 
   const handleCheck = () => {
     const result = processStanza(input);
     setOutput(result);
   };
+
+  // Determine the detected chhanda (prioritize Anustubh if detected)
+  const detectedChhanda = output?.anustubhResult?.isAnustubh
+    ? "अनुष्टुप्"
+    : output?.overallChhanda;
 
   return (
     <main className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-white to-slate-100 pt-24">
@@ -47,14 +57,21 @@ function Home() {
 
         {/* Input Section */}
         <div className=" rounded-2xl  p-3 text-center my-4">
-          {output?.overallChhanda && (
+          {detectedChhanda && (
             <div className="  rounded-2xl flex items-center gap-2 justify-center">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
               <span className="text-slate-700 italic font-bold text-5xl ">
-                {output.overallChhanda
-                  ? output.overallChhanda
-                  : "एकरूप छन्द फेला परेन"}
+                {detectedChhanda}
               </span>
+            </div>
+          )}
+          {output?.anustubhResult?.isAnustubh && (
+            <div className="mt-2 text-sm text-slate-500">
+              ({output.anustubhResult.confidence}% विश्वास •{" "}
+              {output.anustubhResult.inputFormat === "2-line"
+                ? "२-पंक्ति"
+                : "४-पंक्ति"}{" "}
+              ढाँचा)
             </div>
           )}
         </div>

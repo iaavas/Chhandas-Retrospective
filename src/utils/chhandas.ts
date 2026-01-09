@@ -2,6 +2,28 @@ import { CHHANDAS } from "./constant";
 
 export type SYLLABLE = "S" | "I";
 
+// Anustubh detection rules
+export interface AnustubhPadaAnalysis {
+  padaIndex: number;
+  syllableCount: number;
+  syllables: SYLLABLE[];
+  aksharas: string[];
+  eighthSyllableGuru: boolean;
+  fifthSyllableLaghu: boolean;
+  sixthSyllableGuru?: boolean; // Only for even padas
+  errors: string[];
+  text: string;
+}
+
+export interface AnustubhResult {
+  isAnustubh: boolean;
+  confidence: number; // 0-100
+  padaAnalysis: AnustubhPadaAnalysis[];
+  totalSyllables: number;
+  overallErrors: string[];
+  inputFormat: "4-line" | "2-line" | "other";
+}
+
 const VIRAMA = "\u094D";
 const NUKTA = "\u093C";
 const ANUSVARA = "\u0902";
@@ -153,6 +175,237 @@ export function detectChhanda(ganaSeq: string[]): string | null {
   return null;
 }
 
+/**
+ * Cleans Sanskrit text by removing punctuation marks (danda, double danda, etc.)
+ */
+function cleanSanskritText(text: string): string {
+  // Remove । (danda), ॥ (double danda), and other punctuation
+  return text.replace(/[।॥|॰]/g, "").trim();
+}
+
+/**
+ * Splits a line into padas based on syllable count
+ * Each pada should have 8 syllables for Anustubh
+ */
+function splitIntoPadas(text: string): { text: string; aksharas: string[] }[] {
+  const cleanText = cleanSanskritText(text);
+  const aksharas = splitAksharas(cleanText);
+
+  // If we have approximately 16 syllables, split into 2 padas of 8 each
+  if (aksharas.length >= 14 && aksharas.length <= 18) {
+    const midPoint = 8;
+    return [
+      {
+        text: aksharas.slice(0, midPoint).join(""),
+        aksharas: aksharas.slice(0, midPoint),
+      },
+      {
+        text: aksharas.slice(midPoint).join(""),
+        aksharas: aksharas.slice(midPoint),
+      },
+    ];
+  }
+
+  // Otherwise return as single pada
+  return [{ text: cleanText, aksharas }];
+}
+
+/**
+ * Detects if a stanza follows Anustubh (अनुष्टुभ्) meter rules
+ *
+ * Rules:
+ * - 4 padas (quarters/lines)
+ * - 8 syllables per pada
+ * - 32 total syllables
+ * - 8th syllable of each pada should be guru (mandatory)
+ * - 5th syllable is often laghu (common but not mandatory)
+ * - In even padas (2, 4), 6th syllable is often guru (not mandatory)
+ *
+ * Supports both formats:
+ * - 4-line format: one pada per line
+ * - 2-line format: two padas per line (traditional Sanskrit format)
+ */
+export function detectAnustubh(text: string): AnustubhResult {
+  const rawLines = text
+    .trim()
+    .split("\n")
+    .filter((line) => line.trim());
+
+  // Determine input format and extract padas
+  let padas: { text: string; aksharas: string[] }[] = [];
+  let inputFormat: "4-line" | "2-line" | "other" = "other";
+
+  if (rawLines.length === 4) {
+    // 4-line format: one pada per line
+    inputFormat = "4-line";
+    padas = rawLines.map((line) => {
+      const cleanText = cleanSanskritText(line);
+      return {
+        text: cleanText,
+        aksharas: splitAksharas(cleanText),
+      };
+    });
+  } else if (rawLines.length === 2) {
+    // 2-line format: two padas per line (traditional format)
+    inputFormat = "2-line";
+    for (const line of rawLines) {
+      const linePadas = splitIntoPadas(line);
+      padas.push(...linePadas);
+    }
+  } else if (rawLines.length === 1) {
+    // Single line - might contain all 4 padas or just partial
+    const allAksharas = splitAksharas(cleanSanskritText(rawLines[0]));
+    if (allAksharas.length >= 28 && allAksharas.length <= 36) {
+      // Likely all 4 padas in one line
+      inputFormat = "2-line";
+      for (let i = 0; i < 4; i++) {
+        const start = i * 8;
+        const end = Math.min(start + 8, allAksharas.length);
+        padas.push({
+          text: allAksharas.slice(start, end).join(""),
+          aksharas: allAksharas.slice(start, end),
+        });
+      }
+    } else {
+      inputFormat = "other";
+      padas = rawLines.map((line) => {
+        const cleanText = cleanSanskritText(line);
+        return {
+          text: cleanText,
+          aksharas: splitAksharas(cleanText),
+        };
+      });
+    }
+  } else {
+    // Other format - process as is
+    padas = rawLines.map((line) => {
+      const cleanText = cleanSanskritText(line);
+      return {
+        text: cleanText,
+        aksharas: splitAksharas(cleanText),
+      };
+    });
+  }
+
+  const overallErrors: string[] = [];
+  let totalSyllables = 0;
+  let mandatoryRulesMet = 0;
+  let totalMandatoryRules = 0;
+  let optionalRulesMet = 0;
+  let totalOptionalRules = 0;
+
+  // Check if we have 4 padas
+  if (padas.length !== 4) {
+    overallErrors.push(
+      `अनुष्टुभ्मा ४ पाद चाहिन्छ, तर ${padas.length} पाद भेटियो`
+    );
+  }
+
+  const padaAnalysis: AnustubhPadaAnalysis[] = padas.map((pada, index) => {
+    const syllables = detectSyllables(pada.text);
+    const syllableCount = syllables.length;
+    totalSyllables += syllableCount;
+    const errors: string[] = [];
+
+    // Check syllable count (should be 8)
+    const correctSyllableCount = syllableCount === 8;
+    if (!correctSyllableCount) {
+      errors.push(
+        `पाद ${index + 1}: ८ अक्षर चाहिन्छ, तर ${syllableCount} अक्षर भेटियो`
+      );
+    }
+
+    // Check 8th syllable is guru (mandatory)
+    totalMandatoryRules++;
+    const eighthSyllableGuru = syllables[7] === "S";
+    if (!eighthSyllableGuru && syllables.length >= 8) {
+      errors.push(`पाद ${index + 1}: ८औं अक्षर गुरु हुनुपर्छ (अनिवार्य)`);
+    } else if (eighthSyllableGuru) {
+      mandatoryRulesMet++;
+    }
+
+    // Check 5th syllable is laghu (common but not mandatory)
+    totalOptionalRules++;
+    const fifthSyllableLaghu = syllables[4] === "I";
+    if (fifthSyllableLaghu) {
+      optionalRulesMet++;
+    }
+
+    // For even padas (2, 4), check 6th syllable is guru
+    let sixthSyllableGuru: boolean | undefined;
+    if ((index + 1) % 2 === 0) {
+      totalOptionalRules++;
+      sixthSyllableGuru = syllables[5] === "S";
+      if (sixthSyllableGuru) {
+        optionalRulesMet++;
+      }
+    }
+
+    return {
+      padaIndex: index,
+      syllableCount,
+      syllables,
+      aksharas: pada.aksharas,
+      eighthSyllableGuru,
+      fifthSyllableLaghu,
+      sixthSyllableGuru,
+      errors,
+      text: pada.text,
+    };
+  });
+
+  // Calculate confidence score
+  // Mandatory rules: 4 padas + correct syllable count + 8th syllable guru = much higher weight
+  // Optional rules: 5th laghu, 6th guru for even padas = lower weight
+
+  const padaCountCorrect = padas.length === 4;
+  const syllableCountsCorrect = padaAnalysis.every(
+    (p) => p.syllableCount === 8
+  );
+
+  // Base score from mandatory rules
+  let confidence = 0;
+
+  if (padaCountCorrect) {
+    confidence += 30; // 30% for having 4 padas
+  }
+
+  if (syllableCountsCorrect) {
+    confidence += 30; // 30% for correct syllable counts
+  } else {
+    // Partial credit based on how close we are
+    const correctPadas = padaAnalysis.filter(
+      (p) => p.syllableCount === 8
+    ).length;
+    confidence += (correctPadas / 4) * 30;
+  }
+
+  // 8th syllable guru (mandatory) - 30%
+  if (totalMandatoryRules > 0) {
+    confidence += (mandatoryRulesMet / totalMandatoryRules) * 30;
+  }
+
+  // Optional rules - 10%
+  if (totalOptionalRules > 0) {
+    confidence += (optionalRulesMet / totalOptionalRules) * 10;
+  }
+
+  // Determine if it's Anustubh (needs at least 70% confidence and must have 4 padas with 8 syllables each)
+  const isAnustubh =
+    padaCountCorrect &&
+    syllableCountsCorrect &&
+    mandatoryRulesMet >= Math.floor(totalMandatoryRules * 0.75); // At least 75% of 8th syllables should be guru
+
+  return {
+    isAnustubh,
+    confidence: Math.round(confidence),
+    padaAnalysis,
+    totalSyllables,
+    overallErrors: [...overallErrors, ...padaAnalysis.flatMap((p) => p.errors)],
+    inputFormat,
+  };
+}
+
 export function processStanza(text: string) {
   const lines = text
     .trim()
@@ -176,5 +429,8 @@ export function processStanza(text: string) {
       ? chhandas[0]
       : null;
 
-  return { results, overallChhanda };
+  // Also check for Anustubh
+  const anustubhResult = detectAnustubh(text);
+
+  return { results, overallChhanda, anustubhResult };
 }
