@@ -9,6 +9,7 @@ import SyllableCounter from "./SyllableCounter";
 import ChhandaQuiz from "./ChhandaQuiz";
 import PoetryAssistant from "./PoetryAssistant";
 import ChhandaComparison from "./ChhandaComparison";
+import SEO, { pageSEO } from "./components/SEO";
 import {
   processStanza,
   splitAksharas,
@@ -43,6 +44,7 @@ function Home() {
 
   return (
     <main className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-white to-slate-100 pt-24">
+      <SEO {...pageSEO.home} />
       <div className="container max-w-6xl mx-auto px-6 py-16">
         {/* Header */}
         <div className="text-center mb-12">

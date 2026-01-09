@@ -1,6 +1,7 @@
 import React from "react";
 import { processStanza } from "./utils/chhandas";
 import { GANAS, CHHANDAS, type SYLLABLE } from "./utils/constant";
+import SEO, { pageSEO } from "./components/SEO";
 
 function PoetryAssistant() {
   const [input, setInput] = React.useState("");
@@ -180,6 +181,7 @@ function PoetryAssistant() {
 
   return (
     <main className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-white to-slate-100 pt-24">
+      <SEO {...pageSEO.poetryAssistant} />
       <div className="container max-w-7xl mx-auto px-6 py-16">
         {/* Header */}
         <div className="text-center mb-12">

@@ -1,6 +1,7 @@
 import React from "react";
 import { processStanza } from "./utils/chhandas";
 import { GANAS, type SYLLABLE } from "./utils/constant";
+import SEO, { pageSEO } from "./components/SEO";
 
 function ChhandaComparison() {
   const [poem1, setPoem1] = React.useState("");
@@ -114,6 +115,7 @@ function ChhandaComparison() {
 
   return (
     <main className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-white to-slate-100 pt-24">
+      <SEO {...pageSEO.comparison} />
       <div className="container max-w-7xl mx-auto px-6 py-16">
         {/* Header */}
         <div className="text-center mb-12">

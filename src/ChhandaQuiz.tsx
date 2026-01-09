@@ -1,5 +1,6 @@
 import React from "react";
 import { GANAS, CHHANDAS } from "./utils/constant";
+import SEO, { pageSEO } from "./components/SEO";
 
 type QuizQuestion = {
   id: number;
@@ -207,6 +208,7 @@ function ChhandaQuiz() {
   if (!quizStarted) {
     return (
       <main className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-white to-slate-100 pt-24">
+        <SEO {...pageSEO.quiz} />
         <div className="container max-w-4xl mx-auto px-6 py-16">
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-light text-slate-800 mb-3 tracking-tight">
@@ -270,6 +272,7 @@ function ChhandaQuiz() {
     const percentage = (score / questions.length) * 100;
     return (
       <main className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-white to-slate-100 pt-24">
+        <SEO {...pageSEO.quiz} />
         <div className="container max-w-4xl mx-auto px-6 py-16">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-light text-slate-800 mb-3 tracking-tight">
@@ -336,6 +339,7 @@ function ChhandaQuiz() {
 
   return (
     <main className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-white to-slate-100 pt-24">
+      <SEO {...pageSEO.quiz} />
       <div className="container max-w-4xl mx-auto px-6 py-16">
         <div className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-light text-slate-800 mb-3 tracking-tight">

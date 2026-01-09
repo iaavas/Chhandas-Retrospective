@@ -6,6 +6,7 @@ import {
   type AnustubhResult,
 } from "./utils/chhandas";
 import { GANAS, CHHANDAS, type SYLLABLE } from "./utils/constant";
+import SEO, { pageSEO } from "./components/SEO";
 
 function TestChhanda() {
   const [input, setInput] = React.useState("");
@@ -195,6 +196,7 @@ function TestChhanda() {
 
   return (
     <main className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-white to-slate-100 pt-24">
+      <SEO {...pageSEO.test} />
       <div className="container max-w-6xl mx-auto px-6 py-16">
         {/* Header */}
         <div className="text-center mb-12">

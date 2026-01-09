@@ -1,6 +1,7 @@
 import React from "react";
 import { GANAS, CHHANDAS } from "./utils/constant";
 import { useLanguage } from "./contexts/LanguageContext";
+import SEO, { pageSEO } from "./components/SEO";
 
 function ChhandaPatternGenerator() {
   const { t } = useLanguage();
@@ -91,6 +92,7 @@ function ChhandaPatternGenerator() {
 
   return (
     <main className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-white to-slate-100 pt-24">
+      <SEO {...pageSEO.patternGenerator} />
       <div className="container max-w-6xl mx-auto px-6 py-16">
         {/* Header */}
         <div className="text-center mb-12">

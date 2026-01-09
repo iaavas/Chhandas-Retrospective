@@ -1,0 +1,10 @@
+# Robots.txt for chhandas.vercel.app
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://chhandas.vercel.app/sitemap.xml
+
+# Crawl-delay (optional, some crawlers respect this)
+Crawl-delay: 1

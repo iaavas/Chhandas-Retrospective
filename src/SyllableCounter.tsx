@@ -5,6 +5,7 @@ import {
   type SYLLABLE,
 } from "./utils/chhandas";
 import { GANAS } from "./utils/constant";
+import SEO, { pageSEO } from "./components/SEO";
 
 function SyllableCounter() {
   const [input, setInput] = React.useState("");
@@ -102,6 +103,7 @@ Gana Pattern: ${analysis.ganaSeq.join(" ")}`;
 
   return (
     <main className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-white to-slate-100 pt-24">
+      <SEO {...pageSEO.syllableCounter} />
       <div className="container max-w-6xl mx-auto px-6 py-16">
         {/* Header */}
         <div className="text-center mb-12">

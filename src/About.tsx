@@ -1,8 +1,10 @@
 import { CHHANDAS } from "./utils/constant";
+import SEO, { pageSEO } from "./components/SEO";
 
 export default function About() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 pt-24">
+      <SEO {...pageSEO.about} />
       <div className="container max-w-4xl mx-auto px-6 py-16 ">
         {/* Header */}
         <div className="text-center mb-12">
