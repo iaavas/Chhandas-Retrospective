@@ -216,5 +216,23 @@
     "stop": "Stop",
     "animate": "Animate",
     "download": "Download"
+  },
+  "about": {
+    "title": "Introduction to Chhanda",
+    "subtitle": "Basic information about Chhanda Shastra",
+    "whatIsChhanda": "What is Chhanda?",
+    "description1": "Chhanda is the metrical pattern of Sanskrit poetry. It determines the rhythm, syllable count, and structure of verses, playing a vital role in the aesthetics and meaning of classical literature. This application helps you analyze and identify various chhandas in your verses.",
+    "description2": "Chhanda Shastra is an important part of ancient Nepali literature that organizes the structure and rhythm of poetry. It enhances the beauty of poetry and makes it memorable.",
+    "supportedChhandas": "Chhandas supported by this application",
+    "specialRules": "Special Rules",
+    "features": "Features",
+    "syllableAnalysis": "Syllable Analysis",
+    "syllableAnalysisDesc": "Automatically identifies and segments syllables in Nepali text.",
+    "ganaDetection": "Gana Detection",
+    "ganaDetectionDesc": "Creates ganas from syllables and identifies the chhanda pattern.",
+    "chhandaIdentification": "Chhanda Identification",
+    "chhandaIdentificationDesc": "Automatically identifies the chhanda type of a verse.",
+    "instantResults": "Instant Results",
+    "instantResultsDesc": "Provides quick and accurate analysis."
   }
 }

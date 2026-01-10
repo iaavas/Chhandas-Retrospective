@@ -1,7 +1,10 @@
+import { useTranslation } from "react-i18next";
 import { CHHANDAS } from "./utils/constant";
 import SEO, { pageSEO } from "./components/SEO";
 
 export default function About() {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-white pt-20">
       <SEO {...pageSEO.about} />
@@ -9,9 +12,9 @@ export default function About() {
         {/* Header */}
         <div className="mb-10">
           <h1 className="text-3xl font-normal text-slate-900 mb-2">
-            छन्दको परिचय
+            {t("about.title")}
           </h1>
-          <p className="text-slate-500">छन्द शास्त्रको आधारभूत जानकारी</p>
+          <p className="text-slate-500">{t("about.subtitle")}</p>
         </div>
 
         {/* Main Content */}
@@ -19,27 +22,18 @@ export default function About() {
           {/* Description Section */}
           <section>
             <h2 className="text-lg font-medium text-slate-800 border-b border-slate-200 pb-2 mb-4">
-              छन्द के हो?
+              {t("about.whatIsChhanda")}
             </h2>
             <div className="space-y-4 text-slate-600 leading-relaxed">
-              <p>
-                छन्द संस्कृत कविताको मेट्रिकल ढाँचा हो। यसले श्लोकको ताल, अक्षर
-                संख्या र संरचना निर्धारण गर्छ, जसले शास्त्रीय साहित्यको सौन्दर्य
-                र अर्थमा महत्वपूर्ण भूमिका खेल्छ। यो एप्लिकेसनले तपाइँका
-                श्लोकहरूमा विभिन्न छन्दहरू जाँच र विश्लेषण गर्न मद्दत गर्छ।
-              </p>
-              <p>
-                छन्दशास्त्र प्राचीन नेपाली साहित्यको एक महत्वपूर्ण अंग हो जसले
-                कविताको संरचना र लयलाई व्यवस्थित बनाउँछ। यसले काव्यको सौन्दर्य
-                बढाउने र स्मरणीय बनाउने काम गर्छ।
-              </p>
+              <p>{t("about.description1")}</p>
+              <p>{t("about.description2")}</p>
             </div>
           </section>
 
           {/* Supported Chhandas Section */}
           <section>
             <h2 className="text-lg font-medium text-slate-800 border-b border-slate-200 pb-2 mb-4">
-              यस एप्लिकेसनले जाँच गर्न सक्ने छन्दहरू
+              {t("about.supportedChhandas")}
             </h2>
             <div className="space-y-4">
               {Object.entries(CHHANDAS).map(([name, pattern], index) => (
@@ -54,7 +48,7 @@ export default function About() {
                     <span className="text-slate-800 font-medium">{name}</span>
                   </div>
                   <span className="text-slate-500 font-mono text-sm">
-                    {pattern.length ? pattern.join(" ") : "विशेष नियम"}
+                    {pattern.length ? pattern.join(" ") : t("about.specialRules")}
                   </span>
                 </div>
               ))}
@@ -64,38 +58,42 @@ export default function About() {
           {/* Features Section */}
           <section>
             <h2 className="text-lg font-medium text-slate-800 border-b border-slate-200 pb-2 mb-4">
-              विशेषताहरू
+              {t("about.features")}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <h3 className="text-slate-800 font-medium mb-1">
-                  अक्षर विश्लेषण
+                  {t("about.syllableAnalysis")}
                 </h3>
                 <p className="text-slate-600 text-sm">
-                  नेपाली पाठको अक्षरहरूलाई स्वचालित रूपमा पहिचान र विभाजन गर्दछ।
-                </p>
-              </div>
-
-              <div>
-                <h3 className="text-slate-800 font-medium mb-1">गण निर्धारण</h3>
-                <p className="text-slate-600 text-sm">
-                  अक्षरहरूबाट गणहरू बनाउँछ र छन्दको ढाँचा पहिचान गर्छ।
-                </p>
-              </div>
-
-              <div>
-                <h3 className="text-slate-800 font-medium mb-1">छन्द पहिचान</h3>
-                <p className="text-slate-600 text-sm">
-                  श्लोकको छन्द प्रकार स्वचालित रूपमा पहिचान गर्दछ।
+                  {t("about.syllableAnalysisDesc")}
                 </p>
               </div>
 
               <div>
                 <h3 className="text-slate-800 font-medium mb-1">
-                  तत्काल परिणाम
+                  {t("about.ganaDetection")}
                 </h3>
                 <p className="text-slate-600 text-sm">
-                  द्रुत र सटिक विश्लेषण प्रदान गर्दछ।
+                  {t("about.ganaDetectionDesc")}
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-slate-800 font-medium mb-1">
+                  {t("about.chhandaIdentification")}
+                </h3>
+                <p className="text-slate-600 text-sm">
+                  {t("about.chhandaIdentificationDesc")}
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-slate-800 font-medium mb-1">
+                  {t("about.instantResults")}
+                </h3>
+                <p className="text-slate-600 text-sm">
+                  {t("about.instantResultsDesc")}
                 </p>
               </div>
             </div>
