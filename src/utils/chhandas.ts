@@ -214,33 +214,6 @@ function cleanSanskritText(text: string): string {
 }
 
 /**
- * Splits a line into padas based on syllable count
- * Each pada should have 8 syllables for Anustubh
- */
-function splitIntoPadas(text: string): { text: string; aksharas: string[] }[] {
-  const cleanText = cleanSanskritText(text);
-  const aksharas = splitAksharas(cleanText);
-
-  // If we have approximately 16 syllables, split into 2 padas of 8 each
-  if (aksharas.length >= 14 && aksharas.length <= 18) {
-    const midPoint = 8;
-    return [
-      {
-        text: aksharas.slice(0, midPoint).join(""),
-        aksharas: aksharas.slice(0, midPoint),
-      },
-      {
-        text: aksharas.slice(midPoint).join(""),
-        aksharas: aksharas.slice(midPoint),
-      },
-    ];
-  }
-
-  // Otherwise return as single pada
-  return [{ text: cleanText, aksharas }];
-}
-
-/**
  * Detects if a stanza follows Anustubh (अनुष्टुभ्) meter rules
  *
  * Rules:
@@ -261,80 +234,86 @@ export function detectAnustubh(text: string): AnustubhResult {
     .split("\n")
     .filter((line) => line.trim());
 
-  // Determine input format and extract padas
-  let padas: { text: string; aksharas: string[] }[] = [];
+  // Determine input format
   let inputFormat: "4-line" | "2-line" | "other" = "other";
-
   if (rawLines.length === 4) {
-    // 4-line format: one pada per line
     inputFormat = "4-line";
-    padas = rawLines.map((line) => {
-      const cleanText = cleanSanskritText(line);
-      return {
-        text: cleanText,
-        aksharas: splitAksharas(cleanText),
-      };
-    });
   } else if (rawLines.length === 2) {
-    // 2-line format: two padas per line (traditional format)
     inputFormat = "2-line";
-    for (const line of rawLines) {
-      const linePadas = splitIntoPadas(line);
-      padas.push(...linePadas);
-    }
   } else if (rawLines.length === 1) {
-    // Single line - might contain all 4 padas or just partial
-    const allAksharas = splitAksharas(cleanSanskritText(rawLines[0]));
-    if (allAksharas.length >= 28 && allAksharas.length <= 36) {
-      // Likely all 4 padas in one line
-      inputFormat = "2-line";
-      for (let i = 0; i < 4; i++) {
-        const start = i * 8;
-        const end = Math.min(start + 8, allAksharas.length);
-        padas.push({
-          text: allAksharas.slice(start, end).join(""),
-          aksharas: allAksharas.slice(start, end),
-        });
-      }
-    } else {
-      inputFormat = "other";
-      padas = rawLines.map((line) => {
-        const cleanText = cleanSanskritText(line);
-        return {
-          text: cleanText,
-          aksharas: splitAksharas(cleanText),
-        };
-      });
-    }
-  } else {
-    // Other format - process as is
-    padas = rawLines.map((line) => {
-      const cleanText = cleanSanskritText(line);
-      return {
-        text: cleanText,
-        aksharas: splitAksharas(cleanText),
-      };
-    });
+    inputFormat = "2-line";
   }
 
+  // Clean and join ALL text to detect syllables with cross-pada awareness
+  // This ensures syllable weights consider conjuncts across pada boundaries
+  const fullCleanText = rawLines.map((l) => cleanSanskritText(l)).join("");
+  const allAksharas = splitAksharas(fullCleanText);
+  const allSyllables = detectSyllables(fullCleanText);
+
   const overallErrors: string[] = [];
-  let totalSyllables = 0;
   let mandatoryRulesMet = 0;
   let totalMandatoryRules = 0;
   let optionalRulesMet = 0;
   let totalOptionalRules = 0;
 
-  // Check if we have 4 padas
-  if (padas.length !== 4) {
+  // Split syllables and aksharas into padas of 8 syllables each
+  // We need to map aksharas to syllables (some aksharas like म् are skipped)
+  const padas: { text: string; aksharas: string[]; syllables: SYLLABLE[] }[] =
+    [];
+
+  // Map aksharas to syllables by tracking which aksharas are pure closing consonants
+  let syllableIndex = 0;
+  const aksharaToSyllableMap: number[] = []; // aksharaIndex -> syllableIndex (-1 if skipped)
+  for (let i = 0; i < allAksharas.length; i++) {
+    if (isPureClosingConsonant(allAksharas[i])) {
+      aksharaToSyllableMap.push(-1); // This akshara was skipped
+    } else {
+      aksharaToSyllableMap.push(syllableIndex);
+      syllableIndex++;
+    }
+  }
+
+  // Create padas based on syllable boundaries (8 syllables each)
+  for (let padaIdx = 0; padaIdx < 4; padaIdx++) {
+    const syllableStart = padaIdx * 8;
+    const syllableEnd = Math.min(syllableStart + 8, allSyllables.length);
+    const padaSyllables = allSyllables.slice(syllableStart, syllableEnd);
+
+    // Find corresponding aksharas for this pada
+    const aksharaStart = aksharaToSyllableMap.findIndex(
+      (s) => s === syllableStart
+    );
+    let aksharaEnd = aksharaToSyllableMap.findIndex((s) => s === syllableEnd);
+    if (aksharaEnd === -1) aksharaEnd = allAksharas.length;
+
+    // Include any trailing pure closing consonants that belong to this pada
+    while (
+      aksharaEnd < allAksharas.length &&
+      isPureClosingConsonant(allAksharas[aksharaEnd])
+    ) {
+      aksharaEnd++;
+    }
+
+    const padaAksharas = allAksharas.slice(aksharaStart, aksharaEnd);
+
+    padas.push({
+      text: padaAksharas.join(""),
+      aksharas: padaAksharas,
+      syllables: padaSyllables,
+    });
+  }
+
+  // Check if we have 4 padas with syllables
+  const actualPadaCount = padas.filter((p) => p.syllables.length > 0).length;
+  if (actualPadaCount !== 4) {
     overallErrors.push(
-      `अनुष्टुभ्मा ४ पाद चाहिन्छ, तर ${padas.length} पाद भेटियो`
+      `अनुष्टुभ्मा ४ पाद चाहिन्छ, तर ${actualPadaCount} पाद भेटियो`
     );
   }
 
   const padaAnalysis: AnustubhPadaAnalysis[] = padas.map((pada, index) => {
-    const syllables = detectSyllables(pada.text);
+    const syllables = pada.syllables;
     const syllableCount = syllables.length;
-    totalSyllables += syllableCount;
     const errors: string[] = [];
 
     // Check syllable count (should be 8)
@@ -384,6 +363,8 @@ export function detectAnustubh(text: string): AnustubhResult {
     };
   });
 
+  const totalSyllables = allSyllables.length;
+
   // Calculate confidence score
   // Mandatory rules: 4 padas + correct syllable count + 8th syllable guru = much higher weight
   // Optional rules: 5th laghu, 6th guru for even padas = lower weight
@@ -420,11 +401,13 @@ export function detectAnustubh(text: string): AnustubhResult {
     confidence += (optionalRulesMet / totalOptionalRules) * 10;
   }
 
-  // Determine if it's Anustubh (needs at least 70% confidence and must have 4 padas with 8 syllables each)
+  // Determine if it's Anustubh
+  // Primary requirements: 4 padas with 8 syllables each
+  // The 8th syllable guru rule is common but flexible in classical Anustubh
   const isAnustubh =
     padaCountCorrect &&
     syllableCountsCorrect &&
-    mandatoryRulesMet >= Math.floor(totalMandatoryRules * 0.75); // At least 75% of 8th syllables should be guru
+    mandatoryRulesMet >= Math.floor(totalMandatoryRules * 0.5); // At least 50% of 8th syllables should be guru
 
   return {
     isAnustubh,
