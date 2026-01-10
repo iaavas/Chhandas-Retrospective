@@ -709,16 +709,6 @@ function TestChhanda() {
             )}
           </div>
         )}
-
-        <footer className="mt-16 pt-6 border-t border-slate-200 text-center text-slate-500 text-sm">
-          Designed by{" "}
-          <a
-            href="https://www.linkedin.com/in/aavashbaral/"
-            className="text-slate-700 underline underline-offset-2"
-          >
-            आभाष बराल
-          </a>
-        </footer>
       </div>
     </main>
   );

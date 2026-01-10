@@ -17,6 +17,7 @@ import {
 } from "./utils/chhandas";
 import { GANAS, type SYLLABLE } from "./utils/constant";
 import { useLanguage } from "./contexts/LanguageContext";
+import Footer from "./components/Footer";
 
 function Home() {
   const { t } = useLanguage();
@@ -275,16 +276,6 @@ function Home() {
             </div>
           </div>
         )}
-
-        <footer className="mt-16 pt-6 border-t border-slate-200 text-center text-slate-500 text-sm">
-          Designed by{" "}
-          <a
-            href="https://www.linkedin.com/in/aavashbaral/"
-            className="text-slate-700 underline underline-offset-2"
-          >
-            आभाष बराल
-          </a>
-        </footer>
       </div>
     </main>
   );
@@ -308,6 +299,7 @@ export default function App() {
           <Route path="/poetry-assistant" element={<PoetryAssistant />} />
           <Route path="/comparison" element={<ChhandaComparison />} />
         </Routes>
+        <Footer />
       </Router>
     </LanguageProvider>
   );
