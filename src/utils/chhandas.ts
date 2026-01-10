@@ -112,6 +112,20 @@ function leadingConsonantCount(token: string): number {
   return count;
 }
 
+/**
+ * Check if a token is a pure closing consonant (has no vowel).
+ * Examples: म्, क्, न् - these end with virama and have no matra or independent vowel.
+ * These should not be counted as separate syllables but close the previous syllable.
+ */
+function isPureClosingConsonant(token: string): boolean {
+  return (
+    token.endsWith(VIRAMA) &&
+    !containsAny(token, MATRA_LONG) &&
+    !containsAny(token, MATRA_SHORT) &&
+    consonantRe.test(token[0])
+  );
+}
+
 export function detectSyllables(text: string): SYLLABLE[] {
   const norm = text.normalize("NFC");
   const tokens = splitAksharas(norm);
@@ -119,6 +133,16 @@ export function detectSyllables(text: string): SYLLABLE[] {
 
   for (let ti = 0; ti < tokens.length; ti++) {
     const token = tokens[ti];
+
+    // Skip pure closing consonants (like म्, क्) - they have no vowel
+    // They close the previous syllable, making it guru
+    if (isPureClosingConsonant(token)) {
+      if (weights.length > 0) {
+        weights[weights.length - 1] = "S"; // Previous syllable becomes guru (closed)
+      }
+      continue; // Don't count this as a separate syllable
+    }
+
     let isGuru = false;
 
     if (token.length === 1 && independentVowelRe.test(token)) {
@@ -130,11 +154,13 @@ export function detectSyllables(text: string): SYLLABLE[] {
 
     if (!isGuru && containsAny(token, MATRA_LONG)) isGuru = true;
     if (!isGuru && containsAny(token, DIACRITICS)) isGuru = true;
-    if (!isGuru && token.endsWith(VIRAMA)) isGuru = true;
 
     let maybeShort = false;
     if (!isGuru) {
       if (containsAny(token, MATRA_SHORT)) maybeShort = true;
+      // Independent short vowels (अ, इ, उ, ऋ) can also become guru if followed by consonant cluster
+      else if (token.length === 1 && isIndependentShortVowel(token))
+        maybeShort = true;
       else if (!matraRe.test(token) && consonantRe.test(token[0])) {
         maybeShort = true;
       }
@@ -143,12 +169,16 @@ export function detectSyllables(text: string): SYLLABLE[] {
     if (maybeShort) {
       const next = tokens[ti + 1];
       if (next) {
-        const leadCons = leadingConsonantCount(next);
-        if (leadCons >= 2) isGuru = true;
+        // Check if next token is a pure closing consonant (closes this syllable)
+        if (isPureClosingConsonant(next)) {
+          isGuru = true;
+        } else {
+          // Check if next token starts with consonant cluster
+          const leadCons = leadingConsonantCount(next);
+          if (leadCons >= 2) isGuru = true;
+        }
       }
     }
-
-    if (ti === tokens.length - 1) isGuru = true;
 
     weights.push(isGuru ? "S" : "I");
   }
