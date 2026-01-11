@@ -130,3 +130,80 @@ body {
 .stagger-9 { animation-delay: 0.18s; }
 .stagger-10 { animation-delay: 0.2s; }
 
+/* Loading spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Improved focus states */
+*:focus-visible {
+  outline: 2px solid #475569;
+  outline-offset: 2px;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Better mobile table responsiveness */
+@media (max-width: 640px) {
+  .poetry-editor {
+    font-size: 0.95rem;
+  }
+  
+  .poetry-textarea {
+    font-size: 1rem;
+    padding: 0.875rem;
+  }
+  
+  .line-numbers {
+    min-width: 2rem;
+    padding: 0.875rem 0;
+  }
+  
+  .line-numbers span {
+    padding: 0 0.5rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* Improved button hover states */
+button:not(:disabled):hover {
+  transform: translateY(-1px);
+  transition: transform 0.15s ease;
+}
+
+button:not(:disabled):active {
+  transform: translateY(0);
+}
+
+/* Better table cell touch targets on mobile */
+@media (max-width: 640px) {
+  table td {
+    min-width: 2.5rem;
+    padding: 0.5rem 0.25rem;
+  }
+}
+
+/* Smooth transitions for interactive elements */
+.transition-smooth {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Improved empty state */
+.empty-state {
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.empty-state:hover {
+  opacity: 1;
+}
+

@@ -91,14 +91,15 @@ function LineAnalysis({
       </div>
 
       {/* Tabular Analysis */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+      <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+        <div className="min-w-full inline-block">
+          <table className="w-full text-sm" role="table" aria-label={`${t("home.lineAnalysis")} ${lineIndex + 1}`}>
           <tbody>
             {/* Aksharas Row */}
             <tr className="border-b border-slate-100">
-              <td className="text-slate-500 py-2 pr-4 w-20">
+              <th className="text-slate-500 py-2 pr-4 w-20 text-left font-medium" scope="row">
                 {t("home.akshara")}
-              </td>
+              </th>
               {result.aksharas.map((akshara, i) => {
                 const isHovered = hoveredAkshara === i;
                 const isInSameGana = highlightedGanaAksharas.includes(i);
@@ -121,11 +122,16 @@ function LineAnalysis({
                     style={{ animationDelay: `${lineDelay + i * 0.03}s` }}
                     onMouseEnter={() => setHoveredAkshara(i)}
                     onMouseLeave={() => setHoveredAkshara(null)}
+                    onFocus={() => setHoveredAkshara(i)}
+                    onBlur={() => setHoveredAkshara(null)}
+                    tabIndex={0}
+                    role="gridcell"
+                    aria-label={`${akshara}, position ${positionInLine || i + 1}`}
                   >
                     {akshara}
                     {/* Position tooltip on hover */}
                     {isHovered && positionInLine !== null && (
-                      <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs bg-slate-700 text-white px-1.5 py-0.5 rounded whitespace-nowrap">
+                      <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs bg-slate-700 text-white px-1.5 py-0.5 rounded whitespace-nowrap z-10 pointer-events-none">
                         #{positionInLine}
                       </span>
                     )}
@@ -136,7 +142,7 @@ function LineAnalysis({
 
             {/* Syllable Type Row */}
             <tr className="border-b border-slate-100">
-              <td className="text-slate-500 py-2 pr-4">{t("common.matra")}</td>
+              <th className="text-slate-500 py-2 pr-4 text-left font-medium" scope="row">{t("common.matra")}</th>
               {result.aksharas.map((_, i) => {
                 const syllableIndex = result.aksharaToSyllableMap[i];
                 const isHovered = hoveredAkshara === i;
@@ -187,7 +193,7 @@ function LineAnalysis({
 
             {/* Gana Pattern Row */}
             <tr>
-              <td className="text-slate-500 py-2 pr-4">{t("home.gana")}</td>
+              <th className="text-slate-500 py-2 pr-4 text-left font-medium" scope="row">{t("home.gana")}</th>
               {result.aksharas.map((_, i) => {
                 const syllableIndex = result.aksharaToSyllableMap[i];
                 const isInSameGana = highlightedGanaAksharas.includes(i);
@@ -234,6 +240,7 @@ function LineAnalysis({
             </tr>
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );
@@ -257,6 +264,8 @@ function Home() {
   const [copied, setCopied] = React.useState(false);
   const [animationKey, setAnimationKey] = React.useState(0);
   const [soundEnabled, setSoundEnabled] = React.useState(false);
+  const [isAnalyzing, setIsAnalyzing] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
   const resultRef = React.useRef<HTMLDivElement>(null);
 
   // Load shared poem from URL on mount
@@ -316,14 +325,35 @@ function Home() {
   }, [soundEnabled]);
 
   const handleCheck = () => {
-    const result = processStanza(input);
-    setOutput(result);
-    setAnimationKey((k) => k + 1);
-    playAnalysisSound();
-    // Scroll to results after a brief delay
+    if (!input.trim()) {
+      setError("Please enter some text to analyze");
+      return;
+    }
+
+    setError(null);
+    setIsAnalyzing(true);
+
+    // Simulate async operation for better UX (even though it's instant)
     setTimeout(() => {
-      resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 100);
+      try {
+        const result = processStanza(input);
+        setOutput(result);
+        setAnimationKey((k) => k + 1);
+        playAnalysisSound();
+        // Scroll to results after a brief delay
+        setTimeout(() => {
+          resultRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }, 100);
+      } catch (err) {
+        setError("An error occurred while analyzing. Please try again.");
+        console.error("Analysis error:", err);
+      } finally {
+        setIsAnalyzing(false);
+      }
+    }, 150);
   };
 
   const toggleSound = () => {
@@ -335,6 +365,8 @@ function Home() {
   const handleClear = () => {
     setInput("");
     setOutput(null);
+    setError(null);
+    setIsAnalyzing(false);
     // Clear URL params
     window.history.replaceState({}, "", window.location.pathname);
   };
@@ -399,12 +431,13 @@ function Home() {
             {/* Sound toggle */}
             <button
               onClick={toggleSound}
-              className={`p-2 rounded-lg transition-colors ${
+              className={`p-2 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-purple-300 focus:ring-offset-2 ${
                 soundEnabled
                   ? "bg-purple-100 text-purple-700"
                   : "bg-slate-100 text-slate-400 hover:text-slate-600"
               }`}
               title={soundEnabled ? "Sound on" : "Sound off (click to enable)"}
+              aria-label={soundEnabled ? "Disable sound" : "Enable sound"}
             >
               {soundEnabled ? (
                 <svg
@@ -462,14 +495,47 @@ function Home() {
               className="poetry-textarea"
               rows={Math.max(5, input.split("\n").length)}
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => {
+                setInput(e.target.value);
+                setError(null);
+              }}
               onKeyDown={handleKeyDown}
               placeholder={t("home.placeholder")}
+              aria-label="Poetry input"
+              aria-describedby="input-hint"
+              id="poetry-input"
             />
           </div>
+          <p id="input-hint" className="sr-only">
+            Enter your poetry lines. Press Command+Enter or Control+Enter to analyze.
+          </p>
+
+          {/* Error message */}
+          {error && (
+            <div
+              className="mt-3 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm flex items-center gap-2 animate-analysis-reveal"
+              role="alert"
+              aria-live="polite"
+            >
+              <svg
+                className="w-5 h-5 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span>{error}</span>
+            </div>
+          )}
 
           {/* Input stats and actions */}
-          <div className="flex items-center justify-between mt-3">
+          <div className="flex items-center justify-between mt-3 flex-wrap gap-2">
             <div className="text-sm text-slate-400">
               {lineCount > 0 ? (
                 <span>
@@ -485,8 +551,9 @@ function Home() {
               {input.trim() && (
                 <button
                   onClick={handleClear}
-                  className="px-3 py-2 rounded text-sm font-medium transition-colors border border-slate-200 text-slate-500 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-700 flex items-center gap-1.5"
+                  className="px-3 py-2 rounded text-sm font-medium transition-colors border border-slate-200 text-slate-500 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-1 flex items-center gap-1.5"
                   title={t("common.clear")}
+                  aria-label={t("common.clear")}
                 >
                   <svg
                     className="w-4 h-4"
@@ -508,8 +575,9 @@ function Home() {
               {input.trim() && (
                 <button
                   onClick={handleShare}
-                  className="relative px-3 py-2 rounded text-sm font-medium transition-colors border border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 flex items-center gap-1.5"
+                  className="relative px-3 py-2 rounded text-sm font-medium transition-colors border border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-1 flex items-center gap-1.5"
                   title="Share link"
+                  aria-label="Share link"
                 >
                   {copied ? (
                     <>
@@ -551,14 +619,41 @@ function Home() {
               {/* Analyze button */}
               <button
                 onClick={handleCheck}
-                disabled={!input.trim()}
-                className={`px-5 py-2 rounded text-sm font-medium transition-colors ${
-                  !input.trim()
+                disabled={!input.trim() || isAnalyzing}
+                className={`px-5 py-2 rounded text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                  !input.trim() || isAnalyzing
                     ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                    : "bg-slate-900 text-white hover:bg-slate-800"
+                    : "bg-slate-900 text-white hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2"
                 }`}
+                aria-label={t("common.analyze")}
               >
-                {t("common.analyze")}
+                {isAnalyzing ? (
+                  <>
+                    <svg
+                      className="animate-spin h-4 w-4"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    <span>Analyzing...</span>
+                  </>
+                ) : (
+                  t("common.analyze")
+                )}
               </button>
             </div>
           </div>
@@ -570,17 +665,21 @@ function Home() {
             key={`result-${animationKey}`}
             ref={resultRef}
             className="mb-10 py-8 text-center bg-slate-50 -mx-4 px-4 animate-wave-in"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
           >
             <span className="text-xs text-slate-400 uppercase tracking-wider block mb-2 animate-analysis-reveal">
               छन्द
             </span>
-            <span className="text-slate-900 text-4xl animate-gentle-pulse">
+            <span className="text-slate-900 text-4xl animate-gentle-pulse" aria-label={`Detected chhanda: ${detectedChhanda}`}>
               {detectedChhanda}
             </span>
             {output?.anustubhResult?.isAnustubh && (
               <span
                 className="block text-sm text-slate-400 mt-2 animate-analysis-reveal"
                 style={{ animationDelay: "0.1s" }}
+                aria-label={`Confidence: ${output.anustubhResult.confidence}%`}
               >
                 {output.anustubhResult.confidence}%
               </span>
@@ -600,8 +699,25 @@ function Home() {
             key={`no-result-${animationKey}`}
             ref={resultRef}
             className="mb-10 py-6 text-center text-slate-500 bg-slate-50 -mx-4 px-4 animate-wave-in"
+            role="status"
+            aria-live="polite"
           >
-            <span className="text-sm">कुनै छन्द पहिचान भएन</span>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <svg
+                className="w-5 h-5 text-slate-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span className="text-sm font-medium">कुनै छन्द पहिचान भएन</span>
+            </div>
             <div
               className="mt-2 text-xs text-slate-400 animate-analysis-reveal"
               style={{ animationDelay: "0.1s" }}
