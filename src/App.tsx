@@ -4,11 +4,6 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 import Navbar from "./Navbar";
 import About from "./About";
 import TestChhanda from "./TestChhanda";
-import ChhandaPatternGenerator from "./ChhandaPatternGenerator";
-import SyllableCounter from "./SyllableCounter";
-import ChhandaQuiz from "./ChhandaQuiz";
-import PoetryAssistant from "./PoetryAssistant";
-import ChhandaComparison from "./ChhandaComparison";
 import SEO, { pageSEO } from "./components/SEO";
 import { processStanza, type AnustubhResult } from "./utils/chhandas";
 import { GANAS, type SYLLABLE } from "./utils/constant";
@@ -315,14 +310,6 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/test" element={<TestChhanda />} />
-          <Route
-            path="/pattern-generator"
-            element={<ChhandaPatternGenerator />}
-          />
-          <Route path="/syllable-counter" element={<SyllableCounter />} />
-          <Route path="/quiz" element={<ChhandaQuiz />} />
-          <Route path="/poetry-assistant" element={<PoetryAssistant />} />
-          <Route path="/comparison" element={<ChhandaComparison />} />
         </Routes>
         <Footer />
       </Router>
