@@ -443,7 +443,8 @@ export function processStanza(text: string) {
       : null;
 
   // Also check for Anustubh
-  const anustubhResult = detectAnustubh(text);
+  // const anustubhResult = detectAnustubh(text);
+  const anustubhResult = null;
 
   return { results, overallChhanda, anustubhResult };
 }

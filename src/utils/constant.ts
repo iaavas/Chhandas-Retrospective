@@ -113,6 +113,7 @@ export const CHHANDAS: Record<string, string[]> = {
     "ISS",
   ],
   द्रुतविलम्बित: ["III", "SII", "SII", "SIS"],
+  पञ्चचामर: ["ISI", "SIS", "ISI", "SIS", "ISI", "S"],
   हरिणी: ["III", "IIS", "SSS", "SIS", "IIS", "IS"],
   श्रवणाभरणम्: ["III", "ISI", "ISI", "ISI", "ISI", "ISI", "ISI", "IS"],
   // गीतिक छन्दहरू

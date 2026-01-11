@@ -48,7 +48,9 @@ export default function About() {
                     <span className="text-slate-800 font-medium">{name}</span>
                   </div>
                   <span className="text-slate-500 font-mono text-sm">
-                    {pattern.length ? pattern.join(" ") : t("about.specialRules")}
+                    {pattern.length
+                      ? pattern.join(" ")
+                      : t("about.specialRules")}
                   </span>
                 </div>
               ))}
