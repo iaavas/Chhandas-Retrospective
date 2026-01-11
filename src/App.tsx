@@ -447,51 +447,63 @@ function Home() {
 
         {/* Input Section */}
         <div className="mb-8">
-          <div className="relative">
+          {/* Poetry editor with line numbers */}
+          <div className="poetry-editor">
+            {/* Line numbers gutter */}
+            <div className="line-numbers" aria-hidden="true">
+              {Array.from({
+                length: Math.max(5, input.split("\n").length),
+              }).map((_, i) => (
+                <span key={i}>{i + 1}</span>
+              ))}
+            </div>
+            {/* Textarea */}
             <textarea
-              className="w-full p-4 border border-slate-200 rounded text-slate-800 placeholder-slate-400 text-lg leading-relaxed focus:outline-none focus:border-slate-400 resize-none"
-              rows={5}
+              className="poetry-textarea"
+              rows={Math.max(5, input.split("\n").length)}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder={t("home.placeholder")}
             />
-            {input && (
-              <button
-                onClick={handleClear}
-                className="absolute top-3 right-3 text-slate-400 hover:text-slate-600 p-1"
-                title="Clear"
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            )}
           </div>
 
           {/* Input stats and actions */}
           <div className="flex items-center justify-between mt-3">
-            <div className="text-xs text-slate-400">
-              {lineCount > 0 && (
+            <div className="text-sm text-slate-400">
+              {lineCount > 0 ? (
                 <span>
-                  {lineCount} {lineCount === 1 ? "line" : "lines"}
+                  {lineCount}{" "}
+                  {lineCount === 1 ? t("common.line") : t("common.lines")}
                 </span>
-              )}
-              {lineCount === 0 && (
+              ) : (
                 <span className="text-slate-300">⌘+Enter to analyze</span>
               )}
             </div>
             <div className="flex items-center gap-2">
+              {/* Clear button - visible when there's input */}
+              {input.trim() && (
+                <button
+                  onClick={handleClear}
+                  className="px-3 py-2 rounded text-sm font-medium transition-colors border border-slate-200 text-slate-500 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-700 flex items-center gap-1.5"
+                  title={t("common.clear")}
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
+                  </svg>
+                  <span>{t("common.clear")}</span>
+                </button>
+              )}
               {/* Share button */}
               {input.trim() && (
                 <button
