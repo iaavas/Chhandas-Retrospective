@@ -440,8 +440,8 @@ function TestChhanda() {
 
                                 let textClass =
                                   syllable === "S"
-                                    ? "text-red-600"
-                                    : "text-blue-600";
+                                    ? "text-purple-800"
+                                    : "text-teal-600";
                                 if (is8th && syllable !== "S")
                                   textClass = "text-white bg-red-500";
                                 else if (is8th && syllable === "S")
@@ -629,10 +629,10 @@ function TestChhanda() {
                                   key={i}
                                   className={`px-2 py-2 text-center ${
                                     isError
-                                      ? "text-red-600 font-medium"
+                                      ? "text-rose-600 font-medium"
                                       : syllable === "S"
-                                      ? "text-red-600"
-                                      : "text-blue-600"
+                                      ? "text-purple-800"
+                                      : "text-teal-600"
                                   }`}
                                 >
                                   {syllable === "S" ? "गुरु" : "लघु"}
