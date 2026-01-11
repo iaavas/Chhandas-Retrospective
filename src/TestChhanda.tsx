@@ -1,7 +1,6 @@
 import React from "react";
 import {
   processStanza,
-  splitAksharas,
   detectAnustubh,
   type AnustubhResult,
 } from "./utils/chhandas";
@@ -28,6 +27,8 @@ function TestChhanda() {
     analysis: Array<{
       line: string;
       syllables: SYLLABLE[];
+      aksharas: string[];
+      aksharaToSyllableMap: (number | null)[];
       ganaSeq: string[];
       expectedGanaSeq: string[];
       isCorrect: boolean;
@@ -75,8 +76,11 @@ function TestChhanda() {
     }
 
     const analysis = lines.map((line) => {
-      const syllables = processStanza(line).results[0].syllables;
-      const ganaSeq = processStanza(line).results[0].ganaSeq;
+      const lineResult = processStanza(line).results[0];
+      const syllables = lineResult.syllables;
+      const aksharas = lineResult.aksharas;
+      const aksharaToSyllableMap = lineResult.aksharaToSyllableMap;
+      const ganaSeq = lineResult.ganaSeq;
       const expectedGanaSeq = expectedPattern;
 
       // Calculate matra-level errors
@@ -121,6 +125,8 @@ function TestChhanda() {
       return {
         line: line.trim(),
         syllables,
+        aksharas,
+        aksharaToSyllableMap,
         ganaSeq,
         expectedGanaSeq,
         isCorrect,
@@ -590,19 +596,33 @@ function TestChhanda() {
                             <td className="text-slate-500 py-2 pr-4 w-16">
                               अक्षर
                             </td>
-                            {splitAksharas(result.line).map((syllable, i) => (
+                            {result.aksharas.map((akshara, i) => (
                               <td
                                 key={i}
                                 className="px-2 py-2 text-center text-slate-800"
                               >
-                                {syllable}
+                                {akshara}
                               </td>
                             ))}
                           </tr>
                           <tr className="border-b border-slate-100">
                             <td className="text-slate-500 py-2 pr-4">मात्रा</td>
-                            {result.syllables.map((syllable, i) => {
-                              const matraError = result.matraErrors[i];
+                            {result.aksharas.map((_, i) => {
+                              const syllableIndex =
+                                result.aksharaToSyllableMap[i];
+                              if (syllableIndex === null) {
+                                return (
+                                  <td
+                                    key={i}
+                                    className="px-2 py-2 text-center text-xs text-slate-400"
+                                    title="यो अक्षर अघिल्लो मात्रा बन्द गर्छ"
+                                  >
+                                    —
+                                  </td>
+                                );
+                              }
+                              const syllable = result.syllables[syllableIndex];
+                              const matraError = result.matraErrors[syllableIndex];
                               const isError = matraError && matraError.isError;
                               return (
                                 <td
@@ -630,9 +650,20 @@ function TestChhanda() {
                           </tr>
                           <tr>
                             <td className="text-slate-500 py-2 pr-4">गण</td>
-                            {result.syllables.map((_, i) => {
-                              const ganaIndex = Math.floor(i / 3);
-                              const positionInGana = i % 3;
+                            {result.aksharas.map((_, i) => {
+                              const syllableIndex =
+                                result.aksharaToSyllableMap[i];
+                              if (syllableIndex === null) {
+                                return (
+                                  <td
+                                    key={i}
+                                    className="px-2 py-2 text-center"
+                                  ></td>
+                                );
+                              }
+
+                              const ganaIndex = Math.floor(syllableIndex / 3);
+                              const positionInGana = syllableIndex % 3;
                               const gana = result.ganaSeq[ganaIndex];
                               const expectedGana =
                                 result.expectedGanaSeq[ganaIndex];

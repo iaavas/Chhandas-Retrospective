@@ -10,11 +10,7 @@ import ChhandaQuiz from "./ChhandaQuiz";
 import PoetryAssistant from "./PoetryAssistant";
 import ChhandaComparison from "./ChhandaComparison";
 import SEO, { pageSEO } from "./components/SEO";
-import {
-  processStanza,
-  splitAksharas,
-  type AnustubhResult,
-} from "./utils/chhandas";
+import { processStanza, type AnustubhResult } from "./utils/chhandas";
 import { GANAS, type SYLLABLE } from "./utils/constant";
 import { useLanguage } from "./contexts/LanguageContext";
 import Footer from "./components/Footer";
@@ -26,11 +22,13 @@ function Home() {
     results: Array<{
       line: string;
       syllables: SYLLABLE[];
+      aksharas: string[];
+      aksharaToSyllableMap: (number | null)[];
       ganaSeq: string[];
       chhanda: string | null;
     }>;
     overallChhanda: string | null;
-    anustubhResult: AnustubhResult;
+    anustubhResult: AnustubhResult | null;
   } | null>(null);
   const resultRef = React.useRef<HTMLDivElement>(null);
 
@@ -212,12 +210,12 @@ function Home() {
                           <td className="text-slate-500 py-2 pr-4 w-20">
                             {t("home.akshara")}
                           </td>
-                          {splitAksharas(result.line).map((syllable, i) => (
+                          {result.aksharas.map((akshara, i) => (
                             <td
                               key={i}
                               className="px-2 py-2 text-center text-slate-800"
                             >
-                              {syllable}
+                              {akshara}
                             </td>
                           ))}
                         </tr>
@@ -227,20 +225,36 @@ function Home() {
                           <td className="text-slate-500 py-2 pr-4">
                             {t("common.matra")}
                           </td>
-                          {result.syllables.map((syllable, i) => (
-                            <td
-                              key={i}
-                              className={`px-2 py-2 text-center ${
-                                syllable === "S"
-                                  ? "text-red-600"
-                                  : "text-blue-600"
-                              }`}
-                            >
-                              {syllable === "S"
-                                ? t("common.guru")
-                                : t("common.laghu")}
-                            </td>
-                          ))}
+                          {result.aksharas.map((_, i) => {
+                            const syllableIndex =
+                              result.aksharaToSyllableMap[i];
+                            if (syllableIndex === null) {
+                              return (
+                                <td
+                                  key={i}
+                                  className="px-2 py-2 text-center text-xs text-slate-400"
+                                  title="यो अक्षर अघिल्लो मात्रा बन्द गर्छ"
+                                >
+                                  —
+                                </td>
+                              );
+                            }
+                            const syllable = result.syllables[syllableIndex];
+                            return (
+                              <td
+                                key={i}
+                                className={`px-2 py-2 text-center ${
+                                  syllable === "S"
+                                    ? "text-red-600"
+                                    : "text-blue-600"
+                                }`}
+                              >
+                                {syllable === "S"
+                                  ? t("common.guru")
+                                  : t("common.laghu")}
+                              </td>
+                            );
+                          })}
                         </tr>
 
                         {/* Gana Pattern Row */}
@@ -248,9 +262,20 @@ function Home() {
                           <td className="text-slate-500 py-2 pr-4">
                             {t("home.gana")}
                           </td>
-                          {result.syllables.map((_, i) => {
-                            const ganaIndex = Math.floor(i / 3);
-                            const positionInGana = i % 3;
+                          {result.aksharas.map((_, i) => {
+                            const syllableIndex =
+                              result.aksharaToSyllableMap[i];
+                            if (syllableIndex === null) {
+                              return (
+                                <td
+                                  key={i}
+                                  className="px-2 py-2 text-center"
+                                ></td>
+                              );
+                            }
+
+                            const ganaIndex = Math.floor(syllableIndex / 3);
+                            const positionInGana = syllableIndex % 3;
                             const gana = result.ganaSeq[ganaIndex];
                             const showGanaName = positionInGana === 1 && gana;
 

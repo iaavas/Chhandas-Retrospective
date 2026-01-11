@@ -126,10 +126,21 @@ function isPureClosingConsonant(token: string): boolean {
   );
 }
 
+export interface SyllableAnalysis {
+  syllables: SYLLABLE[];
+  aksharaToSyllableMap: (number | null)[]; // Maps each akshara index to syllable index (null if skipped)
+}
+
 export function detectSyllables(text: string): SYLLABLE[] {
+  const result = detectSyllablesWithMapping(text);
+  return result.syllables;
+}
+
+export function detectSyllablesWithMapping(text: string): SyllableAnalysis {
   const norm = text.normalize("NFC");
   const tokens = splitAksharas(norm);
   const weights: SYLLABLE[] = [];
+  const aksharaToSyllableMap: (number | null)[] = [];
 
   for (let ti = 0; ti < tokens.length; ti++) {
     const token = tokens[ti];
@@ -140,6 +151,7 @@ export function detectSyllables(text: string): SYLLABLE[] {
       if (weights.length > 0) {
         weights[weights.length - 1] = "S"; // Previous syllable becomes guru (closed)
       }
+      aksharaToSyllableMap.push(null); // This akshara doesn't have its own syllable
       continue; // Don't count this as a separate syllable
     }
 
@@ -180,10 +192,14 @@ export function detectSyllables(text: string): SYLLABLE[] {
       }
     }
 
+    aksharaToSyllableMap.push(weights.length);
     weights.push(isGuru ? "S" : "I");
   }
 
-  return weights;
+  return {
+    syllables: weights,
+    aksharaToSyllableMap,
+  };
 }
 
 function toGanas(seq: SYLLABLE[]): string[] {
@@ -425,12 +441,17 @@ export function processStanza(text: string) {
     .split("\n")
     .filter((line) => line.trim());
   const results = lines.map((line) => {
-    const syllables = detectSyllables(line.trim());
+    const lineText = line.trim();
+    const { syllables, aksharaToSyllableMap } =
+      detectSyllablesWithMapping(lineText);
     const ganaSeq = toGanas(syllables);
     const chhanda = detectChhanda(ganaSeq);
+    const aksharas = splitAksharas(lineText);
     return {
-      line: line.trim(),
+      line: lineText,
       syllables,
+      aksharas,
+      aksharaToSyllableMap,
       ganaSeq,
       chhanda,
     };

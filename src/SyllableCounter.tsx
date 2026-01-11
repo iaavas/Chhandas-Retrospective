@@ -1,6 +1,6 @@
 import React from "react";
 import {
-  detectSyllables,
+  detectSyllablesWithMapping,
   splitAksharas,
   type SYLLABLE,
 } from "./utils/chhandas";
@@ -12,6 +12,7 @@ function SyllableCounter() {
   const [analysis, setAnalysis] = React.useState<{
     aksharas: string[];
     syllables: SYLLABLE[];
+    aksharaToSyllableMap: (number | null)[];
     ganaSeq: string[];
     statistics: {
       totalAksharas: number;
@@ -28,7 +29,8 @@ function SyllableCounter() {
     if (!input.trim()) return;
 
     const aksharas = splitAksharas(input);
-    const syllables = detectSyllables(input);
+    const { syllables, aksharaToSyllableMap } =
+      detectSyllablesWithMapping(input);
     const ganaSeq = toGanas(syllables);
 
     const guruCount = syllables.filter((s) => s === "S").length;
@@ -37,6 +39,7 @@ function SyllableCounter() {
     setAnalysis({
       aksharas,
       syllables,
+      aksharaToSyllableMap,
       ganaSeq,
       statistics: {
         totalAksharas: aksharas.length,
@@ -270,18 +273,34 @@ Gana Pattern: ${analysis.ganaSeq.join(" ")}`;
                       <td className="text-slate-500 text-sm font-medium py-2 pr-4 border-r border-slate-200">
                         मात्रा
                       </td>
-                      {analysis.syllables.map((syllable, i) => (
-                        <td
-                          key={i}
-                          className={`px-2 py-2 text-center text-sm font-medium border-r border-slate-100 last:border-r-0 ${
-                            syllable === "S"
-                              ? "text-red-700 bg-red-50/70"
-                              : "text-blue-700 bg-blue-50/70"
-                          }`}
-                        >
-                          {syllable === "S" ? "गुरु" : "लघु"}
-                        </td>
-                      ))}
+                      {analysis.aksharas.map((_, i) => {
+                        const syllableIndex = analysis.aksharaToSyllableMap[i];
+                        if (syllableIndex === null) {
+                          // This akshara is a pure closing consonant
+                          return (
+                            <td
+                              key={i}
+                              className="px-2 py-2 text-center text-xs font-medium border-r border-slate-100 last:border-r-0 bg-slate-100/70 text-slate-400"
+                              title="यो अक्षर अघिल्लो मात्रा बन्द गर्छ"
+                            >
+                              —
+                            </td>
+                          );
+                        }
+                        const syllable = analysis.syllables[syllableIndex];
+                        return (
+                          <td
+                            key={i}
+                            className={`px-2 py-2 text-center text-sm font-medium border-r border-slate-100 last:border-r-0 ${
+                              syllable === "S"
+                                ? "text-red-700 bg-red-50/70"
+                                : "text-blue-700 bg-blue-50/70"
+                            }`}
+                          >
+                            {syllable === "S" ? "गुरु" : "लघु"}
+                          </td>
+                        );
+                      })}
                     </tr>
 
                     {/* Gana Pattern Row */}
@@ -289,9 +308,20 @@ Gana Pattern: ${analysis.ganaSeq.join(" ")}`;
                       <td className="text-slate-500 text-sm font-medium py-2 pr-4 border-r border-slate-200">
                         गण
                       </td>
-                      {analysis.syllables.map((_, i) => {
-                        const ganaIndex = Math.floor(i / 3);
-                        const positionInGana = i % 3;
+                      {analysis.aksharas.map((_, i) => {
+                        const syllableIndex = analysis.aksharaToSyllableMap[i];
+                        if (syllableIndex === null) {
+                          // This akshara is a pure closing consonant
+                          return (
+                            <td
+                              key={i}
+                              className="px-2 py-2 text-center text-xs font-medium border-r border-slate-100 last:border-r-0 bg-slate-100/70"
+                            ></td>
+                          );
+                        }
+
+                        const ganaIndex = Math.floor(syllableIndex / 3);
+                        const positionInGana = syllableIndex % 3;
                         const gana = analysis.ganaSeq[ganaIndex];
 
                         const showGanaName = positionInGana === 1 && gana;
