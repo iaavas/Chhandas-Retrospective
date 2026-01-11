@@ -230,7 +230,27 @@ function Home() {
     overallChhanda: string | null;
     anustubhResult: AnustubhResult | null;
   } | null>(null);
+  const [copied, setCopied] = React.useState(false);
   const resultRef = React.useRef<HTMLDivElement>(null);
+
+  // Load shared poem from URL on mount
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const sharedPoem = params.get("poem");
+    if (sharedPoem) {
+      try {
+        const decoded = decodeURIComponent(sharedPoem);
+        setInput(decoded);
+        // Auto-analyze after loading
+        setTimeout(() => {
+          const result = processStanza(decoded);
+          setOutput(result);
+        }, 100);
+      } catch {
+        // Invalid encoding, ignore
+      }
+    }
+  }, []);
 
   const handleCheck = () => {
     const result = processStanza(input);
@@ -244,6 +264,30 @@ function Home() {
   const handleClear = () => {
     setInput("");
     setOutput(null);
+    // Clear URL params
+    window.history.replaceState({}, "", window.location.pathname);
+  };
+
+  // Share link functionality
+  const handleShare = async () => {
+    const encoded = encodeURIComponent(input);
+    const shareUrl = `${window.location.origin}${window.location.pathname}?poem=${encoded}`;
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback for older browsers
+      const textArea = document.createElement("textarea");
+      textArea.value = shareUrl;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   // Keyboard shortcut: Cmd/Ctrl + Enter to analyze
@@ -326,17 +370,64 @@ function Home() {
                 <span className="text-slate-300">⌘+Enter to analyze</span>
               )}
             </div>
-            <button
-              onClick={handleCheck}
-              disabled={!input.trim()}
-              className={`px-5 py-2 rounded text-sm font-medium transition-colors ${
-                !input.trim()
-                  ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                  : "bg-slate-900 text-white hover:bg-slate-800"
-              }`}
-            >
-              {t("common.analyze")}
-            </button>
+            <div className="flex items-center gap-2">
+              {/* Share button */}
+              {input.trim() && (
+                <button
+                  onClick={handleShare}
+                  className="relative px-3 py-2 rounded text-sm font-medium transition-colors border border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 flex items-center gap-1.5"
+                  title="Share link"
+                >
+                  {copied ? (
+                    <>
+                      <svg
+                        className="w-4 h-4 text-green-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      <span className="text-green-600">Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                        />
+                      </svg>
+                      <span>Share</span>
+                    </>
+                  )}
+                </button>
+              )}
+              {/* Analyze button */}
+              <button
+                onClick={handleCheck}
+                disabled={!input.trim()}
+                className={`px-5 py-2 rounded text-sm font-medium transition-colors ${
+                  !input.trim()
+                    ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                    : "bg-slate-900 text-white hover:bg-slate-800"
+                }`}
+              >
+                {t("common.analyze")}
+              </button>
+            </div>
           </div>
         </div>
 

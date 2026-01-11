@@ -622,7 +622,8 @@ function TestChhanda() {
                                 );
                               }
                               const syllable = result.syllables[syllableIndex];
-                              const matraError = result.matraErrors[syllableIndex];
+                              const matraError =
+                                result.matraErrors[syllableIndex];
                               const isError = matraError && matraError.isError;
                               return (
                                 <td
