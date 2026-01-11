@@ -22,12 +22,24 @@ interface LineAnalysisProps {
   };
   lineIndex: number;
   t: (key: string) => string;
+  animationKey?: number;
 }
 
-function LineAnalysis({ result, lineIndex, t }: LineAnalysisProps) {
+function LineAnalysis({
+  result,
+  lineIndex,
+  t,
+  animationKey,
+}: LineAnalysisProps) {
   const [hoveredAkshara, setHoveredAkshara] = React.useState<number | null>(
     null
   );
+
+  // Get stagger class for animation
+  const getStaggerClass = (index: number) => {
+    const staggerIndex = Math.min(index + 1, 10);
+    return `stagger-${staggerIndex}`;
+  };
 
   // Get the syllable index and gana info for the hovered akshara
   const hoveredSyllableIndex =
@@ -52,8 +64,14 @@ function LineAnalysis({ result, lineIndex, t }: LineAnalysisProps) {
   const highlightedGanaAksharas =
     hoveredGanaIndex !== null ? getGanaAksharaIndices(hoveredGanaIndex) : [];
 
+  // Line animation delay based on line index
+  const lineDelay = lineIndex * 0.1;
+
   return (
-    <div className="space-y-4">
+    <div
+      className="space-y-4 animate-analysis-reveal"
+      style={{ animationDelay: `${lineDelay}s` }}
+    >
       {/* Line Text */}
       <div className="flex justify-between items-start">
         <div>
@@ -63,7 +81,10 @@ function LineAnalysis({ result, lineIndex, t }: LineAnalysisProps) {
           <p className="text-slate-900 text-xl mt-1">{result.line}</p>
         </div>
         {result.chhanda && (
-          <span className="text-sm text-slate-600 bg-slate-100 px-2 py-1 rounded">
+          <span
+            className="text-sm text-slate-600 bg-slate-100 px-2 py-1 rounded animate-wave-in"
+            style={{ animationDelay: `${lineDelay + 0.2}s` }}
+          >
             {result.chhanda}
           </span>
         )}
@@ -87,14 +108,17 @@ function LineAnalysis({ result, lineIndex, t }: LineAnalysisProps) {
 
                 return (
                   <td
-                    key={i}
-                    className={`px-2 py-2 text-center cursor-pointer transition-all duration-150 relative ${
+                    key={`${animationKey}-${i}`}
+                    className={`px-2 py-2 text-center cursor-pointer transition-all duration-150 relative animate-syllable-wave ${getStaggerClass(
+                      i
+                    )} ${
                       isHovered
                         ? "bg-amber-100 text-slate-900 font-medium rounded"
                         : isInSameGana && hoveredAkshara !== null
                         ? "bg-slate-100"
                         : "text-slate-800"
                     }`}
+                    style={{ animationDelay: `${lineDelay + i * 0.03}s` }}
                     onMouseEnter={() => setHoveredAkshara(i)}
                     onMouseLeave={() => setHoveredAkshara(null)}
                   >
@@ -231,6 +255,8 @@ function Home() {
     anustubhResult: AnustubhResult | null;
   } | null>(null);
   const [copied, setCopied] = React.useState(false);
+  const [animationKey, setAnimationKey] = React.useState(0);
+  const [soundEnabled, setSoundEnabled] = React.useState(false);
   const resultRef = React.useRef<HTMLDivElement>(null);
 
   // Load shared poem from URL on mount
@@ -245,20 +271,65 @@ function Home() {
         setTimeout(() => {
           const result = processStanza(decoded);
           setOutput(result);
+          setAnimationKey((k) => k + 1);
         }, 100);
       } catch {
         // Invalid encoding, ignore
       }
     }
+    // Load sound preference from localStorage
+    const savedSound = localStorage.getItem("chhandas-sound");
+    if (savedSound === "true") setSoundEnabled(true);
   }, []);
+
+  // Play soft chime on analysis complete
+  const playAnalysisSound = React.useCallback(() => {
+    if (!soundEnabled) return;
+    try {
+      const audioContext = new (window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext })
+          .webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+      oscillator.frequency.setValueAtTime(
+        659.25,
+        audioContext.currentTime + 0.1
+      ); // E5
+      oscillator.type = "sine";
+
+      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(
+        0.01,
+        audioContext.currentTime + 0.3
+      );
+
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.3);
+    } catch {
+      // Audio not supported, ignore
+    }
+  }, [soundEnabled]);
 
   const handleCheck = () => {
     const result = processStanza(input);
     setOutput(result);
+    setAnimationKey((k) => k + 1);
+    playAnalysisSound();
     // Scroll to results after a brief delay
     setTimeout(() => {
       resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 100);
+  };
+
+  const toggleSound = () => {
+    const newValue = !soundEnabled;
+    setSoundEnabled(newValue);
+    localStorage.setItem("chhandas-sound", String(newValue));
   };
 
   const handleClear = () => {
@@ -318,10 +389,60 @@ function Home() {
       <div className="max-w-3xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="mb-10">
-          <h1 className="text-3xl font-normal text-slate-900 mb-2">
-            {t("home.title")}
-          </h1>
-          <p className="text-slate-500">{t("home.subtitle")}</p>
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-3xl font-normal text-slate-900 mb-2">
+                {t("home.title")}
+              </h1>
+              <p className="text-slate-500">{t("home.subtitle")}</p>
+            </div>
+            {/* Sound toggle */}
+            <button
+              onClick={toggleSound}
+              className={`p-2 rounded-lg transition-colors ${
+                soundEnabled
+                  ? "bg-purple-100 text-purple-700"
+                  : "bg-slate-100 text-slate-400 hover:text-slate-600"
+              }`}
+              title={soundEnabled ? "Sound on" : "Sound off (click to enable)"}
+            >
+              {soundEnabled ? (
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"
+                  />
+                </svg>
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Input Section */}
@@ -434,19 +555,28 @@ function Home() {
         {/* Detected Chhanda */}
         {detectedChhanda && (
           <div
+            key={`result-${animationKey}`}
             ref={resultRef}
-            className="mb-10 py-8 text-center bg-slate-50 -mx-4 px-4"
+            className="mb-10 py-8 text-center bg-slate-50 -mx-4 px-4 animate-wave-in"
           >
-            <span className="text-xs text-slate-400 uppercase tracking-wider block mb-2">
+            <span className="text-xs text-slate-400 uppercase tracking-wider block mb-2 animate-analysis-reveal">
               छन्द
             </span>
-            <span className="text-slate-900 text-4xl">{detectedChhanda}</span>
+            <span className="text-slate-900 text-4xl animate-gentle-pulse">
+              {detectedChhanda}
+            </span>
             {output?.anustubhResult?.isAnustubh && (
-              <span className="block text-sm text-slate-400 mt-2">
+              <span
+                className="block text-sm text-slate-400 mt-2 animate-analysis-reveal"
+                style={{ animationDelay: "0.1s" }}
+              >
                 {output.anustubhResult.confidence}%
               </span>
             )}
-            <div className="mt-4 text-xs text-slate-400">
+            <div
+              className="mt-4 text-xs text-slate-400 animate-analysis-reveal"
+              style={{ animationDelay: "0.15s" }}
+            >
               {totalSyllables} अक्षर • {output?.results.length} पंक्ति
             </div>
           </div>
@@ -455,11 +585,15 @@ function Home() {
         {/* No chhanda detected */}
         {output && !detectedChhanda && (
           <div
+            key={`no-result-${animationKey}`}
             ref={resultRef}
-            className="mb-10 py-6 text-center text-slate-500 bg-slate-50 -mx-4 px-4"
+            className="mb-10 py-6 text-center text-slate-500 bg-slate-50 -mx-4 px-4 animate-wave-in"
           >
             <span className="text-sm">कुनै छन्द पहिचान भएन</span>
-            <div className="mt-2 text-xs text-slate-400">
+            <div
+              className="mt-2 text-xs text-slate-400 animate-analysis-reveal"
+              style={{ animationDelay: "0.1s" }}
+            >
               {totalSyllables} अक्षर • {output?.results.length} पंक्ति
             </div>
           </div>
@@ -488,10 +622,11 @@ function Home() {
             <div className="space-y-10">
               {output.results.map((result, lineIndex) => (
                 <LineAnalysis
-                  key={lineIndex}
+                  key={`${animationKey}-${lineIndex}`}
                   result={result}
                   lineIndex={lineIndex}
                   t={t}
+                  animationKey={animationKey}
                 />
               ))}
             </div>
