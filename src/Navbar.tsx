@@ -38,7 +38,7 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-6">
             <Link
               to="/"
-              className={`text-sm ${
+              className={`text-base ${
                 isActive("/")
                   ? "text-slate-900 font-medium"
                   : "text-slate-500 hover:text-slate-700"
@@ -49,7 +49,7 @@ export default function Navbar() {
 
             <Link
               to="/test"
-              className={`text-sm ${
+              className={`text-base ${
                 isActive("/test")
                   ? "text-slate-900 font-medium"
                   : "text-slate-500 hover:text-slate-700"
@@ -60,7 +60,7 @@ export default function Navbar() {
 
             <Link
               to="/examples"
-              className={`text-sm ${
+              className={`text-base ${
                 isActive("/examples")
                   ? "text-slate-900 font-medium"
                   : "text-slate-500 hover:text-slate-700"
@@ -71,7 +71,7 @@ export default function Navbar() {
 
             <Link
               to="/about"
-              className={`text-sm ${
+              className={`text-base ${
                 isActive("/about")
                   ? "text-slate-900 font-medium"
                   : "text-slate-500 hover:text-slate-700"
@@ -82,7 +82,7 @@ export default function Navbar() {
 
             <button
               onClick={toggleLanguage}
-              className="text-sm text-slate-500 hover:text-slate-700"
+              className="text-base text-slate-500 hover:text-slate-700"
             >
               {currentLanguage === "ne" ? "EN" : "ने"}
             </button>
@@ -121,7 +121,7 @@ export default function Navbar() {
               <Link
                 to="/"
                 onClick={closeMenu}
-                className={`block py-2 text-sm ${
+                className={`block py-2 text-base ${
                   isActive("/")
                     ? "text-slate-900 font-medium"
                     : "text-slate-600"
@@ -132,7 +132,7 @@ export default function Navbar() {
               <Link
                 to="/test"
                 onClick={closeMenu}
-                className={`block py-2 text-sm ${
+                className={`block py-2 text-base ${
                   isActive("/test")
                     ? "text-slate-900 font-medium"
                     : "text-slate-600"
@@ -143,7 +143,7 @@ export default function Navbar() {
               <Link
                 to="/examples"
                 onClick={closeMenu}
-                className={`block py-2 text-sm ${
+                className={`block py-2 text-base ${
                   isActive("/examples")
                     ? "text-slate-900 font-medium"
                     : "text-slate-600"
@@ -154,7 +154,7 @@ export default function Navbar() {
               <Link
                 to="/about"
                 onClick={closeMenu}
-                className={`block py-2 text-sm ${
+                className={`block py-2 text-base ${
                   isActive("/about")
                     ? "text-slate-900 font-medium"
                     : "text-slate-600"
@@ -165,7 +165,7 @@ export default function Navbar() {
 
               <button
                 onClick={toggleLanguage}
-                className="block py-2 text-sm text-slate-600"
+                className="block py-2 text-base text-slate-600"
               >
                 {currentLanguage === "ne"
                   ? "Switch to English"
