@@ -464,8 +464,7 @@ export function processStanza(text: string) {
       : null;
 
   // Also check for Anustubh
-  // const anustubhResult = detectAnustubh(text);
-  const anustubhResult = null;
+  const anustubhResult = detectAnustubh(text);
 
   return { results, overallChhanda, anustubhResult };
 }

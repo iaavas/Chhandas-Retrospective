@@ -59,6 +59,17 @@ export default function Navbar() {
             </Link>
 
             <Link
+              to="/examples"
+              className={`text-sm ${
+                isActive("/examples")
+                  ? "text-slate-900 font-medium"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              {t("nav.examples")}
+            </Link>
+
+            <Link
               to="/about"
               className={`text-sm ${
                 isActive("/about")
@@ -128,6 +139,17 @@ export default function Navbar() {
                 }`}
               >
                 {t("nav.test")}
+              </Link>
+              <Link
+                to="/examples"
+                onClick={closeMenu}
+                className={`block py-2 text-sm ${
+                  isActive("/examples")
+                    ? "text-slate-900 font-medium"
+                    : "text-slate-600"
+                }`}
+              >
+                {t("nav.examples")}
               </Link>
               <Link
                 to="/about"

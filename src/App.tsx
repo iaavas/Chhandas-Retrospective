@@ -4,6 +4,7 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 import Navbar from "./Navbar";
 import About from "./About";
 import TestChhanda from "./TestChhanda";
+import Examples from "./Examples";
 import SEO, { pageSEO } from "./components/SEO";
 import { processStanza, type AnustubhResult } from "./utils/chhandas";
 import { GANAS, type SYLLABLE } from "./utils/constant";
@@ -400,10 +401,14 @@ function Home() {
     }
   };
 
-  // Determine the detected chhanda (prioritize Anustubh if detected)
-  const detectedChhanda = output?.anustubhResult?.isAnustubh
+  // Determine the detected chhanda
+  // Priority: 1) Line-by-line detection (if all lines match same chhanda)
+  //           2) Anustubh detection (only if no line-level chhanda detected)
+  const detectedChhanda = output?.overallChhanda
+    ? output.overallChhanda
+    : output?.anustubhResult?.isAnustubh
     ? "अनुष्टुप्"
-    : output?.overallChhanda;
+    : null;
 
   // Count lines and syllables
   const lineCount = input.trim()
@@ -675,7 +680,7 @@ function Home() {
             <span className="text-slate-900 text-4xl animate-gentle-pulse" aria-label={`Detected chhanda: ${detectedChhanda}`}>
               {detectedChhanda}
             </span>
-            {output?.anustubhResult?.isAnustubh && (
+            {detectedChhanda === "अनुष्टुप्" && output?.anustubhResult?.isAnustubh && (
               <span
                 className="block text-sm text-slate-400 mt-2 animate-analysis-reveal"
                 style={{ animationDelay: "0.1s" }}
@@ -774,6 +779,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/test" element={<TestChhanda />} />
+          <Route path="/examples" element={<Examples />} />
         </Routes>
         <Footer />
       </Router>

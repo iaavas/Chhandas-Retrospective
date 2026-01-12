@@ -8,7 +8,8 @@
     "assistant": "Assistant",
     "comparison": "Comparison",
     "visualizer": "Visualizer",
-    "about": "About"
+    "about": "About",
+    "examples": "Examples"
   },
   "common": {
     "analyze": "Analyze",
@@ -236,5 +237,11 @@
     "chhandaIdentificationDesc": "Automatically identifies the chhanda type of a verse.",
     "instantResults": "Instant Results",
     "instantResultsDesc": "Provides quick and accurate analysis."
+  },
+  "examples": {
+    "title": "Chhanda Examples",
+    "subtitle": "Explore famous shlokas and their meters",
+    "clickToAnalyze": "Click to analyze",
+    "footerNote": "Click any example to see its full analysis"
   }
 }

@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
-/* Typography - Mukta for Nepali */
+/* Typography - Inter for English, Mukta for Nepali */
 body {
-  font-family: 'Mukta', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Inter', 'Mukta', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -61,6 +61,7 @@ body {
     opacity: 0;
     transform: translateY(10px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -68,9 +69,12 @@ body {
 }
 
 @keyframes gentle-pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.85;
   }
@@ -81,10 +85,12 @@ body {
     opacity: 0;
     transform: translateY(8px) scale(0.98);
   }
+
   60% {
     opacity: 1;
     transform: translateY(-2px) scale(1.01);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -96,6 +102,7 @@ body {
     opacity: 0;
     transform: translateY(5px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -119,16 +126,45 @@ body {
 }
 
 /* Staggered animation delays for syllables */
-.stagger-1 { animation-delay: 0.02s; }
-.stagger-2 { animation-delay: 0.04s; }
-.stagger-3 { animation-delay: 0.06s; }
-.stagger-4 { animation-delay: 0.08s; }
-.stagger-5 { animation-delay: 0.1s; }
-.stagger-6 { animation-delay: 0.12s; }
-.stagger-7 { animation-delay: 0.14s; }
-.stagger-8 { animation-delay: 0.16s; }
-.stagger-9 { animation-delay: 0.18s; }
-.stagger-10 { animation-delay: 0.2s; }
+.stagger-1 {
+  animation-delay: 0.02s;
+}
+
+.stagger-2 {
+  animation-delay: 0.04s;
+}
+
+.stagger-3 {
+  animation-delay: 0.06s;
+}
+
+.stagger-4 {
+  animation-delay: 0.08s;
+}
+
+.stagger-5 {
+  animation-delay: 0.1s;
+}
+
+.stagger-6 {
+  animation-delay: 0.12s;
+}
+
+.stagger-7 {
+  animation-delay: 0.14s;
+}
+
+.stagger-8 {
+  animation-delay: 0.16s;
+}
+
+.stagger-9 {
+  animation-delay: 0.18s;
+}
+
+.stagger-10 {
+  animation-delay: 0.2s;
+}
 
 /* Loading spinner */
 @keyframes spin {
@@ -157,17 +193,17 @@ html {
   .poetry-editor {
     font-size: 0.95rem;
   }
-  
+
   .poetry-textarea {
     font-size: 1rem;
     padding: 0.875rem;
   }
-  
+
   .line-numbers {
     min-width: 2rem;
     padding: 0.875rem 0;
   }
-  
+
   .line-numbers span {
     padding: 0 0.5rem;
     font-size: 0.75rem;
@@ -206,4 +242,3 @@ button:not(:disabled):active {
 .empty-state:hover {
   opacity: 1;
 }
-
