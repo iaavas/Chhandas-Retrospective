@@ -420,14 +420,18 @@ export function detectAnustubh(text: string): AnustubhResult {
   // Determine if it's Anustubh
   // Primary requirements: 4 padas with 8 syllables each
   // The 8th syllable guru rule is common but flexible in classical Anustubh
+  // STRICT CHECK: Total syllables must be 32 (or very close, 31-33) to avoid false positives for longer meters
+  const correctTotalSyllables = totalSyllables >= 31 && totalSyllables <= 33;
+
   const isAnustubh =
     padaCountCorrect &&
     syllableCountsCorrect &&
+    correctTotalSyllables &&
     mandatoryRulesMet >= Math.floor(totalMandatoryRules * 0.5); // At least 50% of 8th syllables should be guru
 
   return {
     isAnustubh,
-    confidence: Math.round(confidence),
+    confidence: correctTotalSyllables ? Math.round(confidence) : 0, // Zero confidence if syllable count is wrong
     padaAnalysis,
     totalSyllables,
     overallErrors: [...overallErrors, ...padaAnalysis.flatMap((p) => p.errors)],
