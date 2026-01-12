@@ -8,9 +8,11 @@ export interface AnustubhPadaAnalysis {
   syllableCount: number;
   syllables: SYLLABLE[];
   aksharas: string[];
-  eighthSyllableGuru: boolean;
-  fifthSyllableLaghu: boolean;
-  sixthSyllableGuru?: boolean; // Only for even padas
+  fifthSyllableLaghu: boolean; // y
+  sixthSyllableGuru: boolean; // m
+  seventhSyllableLaghu: boolean; // r
+  isEvenPada: boolean;
+  followsPattern: boolean;
   errors: string[];
   text: string;
 }
@@ -267,10 +269,7 @@ export function detectAnustubh(text: string): AnustubhResult {
   const allSyllables = detectSyllables(fullCleanText);
 
   const overallErrors: string[] = [];
-  let mandatoryRulesMet = 0;
-  let totalMandatoryRules = 0;
-  let optionalRulesMet = 0;
-  let totalOptionalRules = 0;
+
 
   // Split syllables and aksharas into padas of 8 syllables each
   // We need to map aksharas to syllables (some aksharas like म् are skipped)
@@ -331,6 +330,7 @@ export function detectAnustubh(text: string): AnustubhResult {
     const syllables = pada.syllables;
     const syllableCount = syllables.length;
     const errors: string[] = [];
+    const isEvenPada = (index + 1) % 2 === 0;
 
     // Check syllable count (should be 8)
     const correctSyllableCount = syllableCount === 8;
@@ -340,29 +340,40 @@ export function detectAnustubh(text: string): AnustubhResult {
       );
     }
 
-    // Check 8th syllable is guru (mandatory)
-    totalMandatoryRules++;
-    const eighthSyllableGuru = syllables[7] === "S";
-    if (!eighthSyllableGuru && syllables.length >= 8) {
-      errors.push(`पाद ${index + 1}: ८औं अक्षर गुरु हुनुपर्छ (अनिवार्य)`);
-    } else if (eighthSyllableGuru) {
-      mandatoryRulesMet++;
-    }
+    // Classic Definition: "Shloke sashtham gurur jneyam" (6th is Guru in all padas)
+    // "Sarvatra laghu panchamam" (5th is Laghu in all padas)
+    // "Dvi-chatush-padayor hrasvam" (7th is Laghu in 2nd and 4th padas - Even)
+    // "Dirgham anyayoh" (7th is Guru in 1st and 3rd padas - Odd)
 
-    // Check 5th syllable is laghu (common but not mandatory)
-    totalOptionalRules++;
+    // However, in practice (Vipula), Odd padas have 4 valid variations.
+    // Even padas are much stricter:
+    // Even Padas MUST satisfy: 5th=Laghu, 6th=Guru, 7th=Laghu (J-gan pattern I-S-I)
+
     const fifthSyllableLaghu = syllables[4] === "I";
-    if (fifthSyllableLaghu) {
-      optionalRulesMet++;
-    }
+    const sixthSyllableGuru = syllables[5] === "S";
+    const seventhSyllableLaghu = syllables[6] === "I";
+    
+    let followsPattern = false;
 
-    // For even padas (2, 4), check 6th syllable is guru
-    let sixthSyllableGuru: boolean | undefined;
-    if ((index + 1) % 2 === 0) {
-      totalOptionalRules++;
-      sixthSyllableGuru = syllables[5] === "S";
-      if (sixthSyllableGuru) {
-        optionalRulesMet++;
+    if (syllables.length >= 7) {
+      if (isEvenPada) {
+        // Even Pada STRICT Rule: I-S-I (Laghu-Guru-Laghu)
+        // 5th Laghu, 6th Guru, 7th Laghu
+        if (fifthSyllableLaghu && sixthSyllableGuru && seventhSyllableLaghu) {
+          followsPattern = true;
+        } else {
+             if (!fifthSyllableLaghu) errors.push(`पाद ${index + 1} (सम): ५औं अक्षर लघु हुनुपर्छ`);
+             if (!sixthSyllableGuru) errors.push(`पाद ${index + 1} (सम): ६औं अक्षर गुरु हुनुपर्छ`);
+             if (!seventhSyllableLaghu) errors.push(`पाद ${index + 1} (सम): ७औं अक्षर लघु हुनुपर्छ`);
+        }
+      } else {
+        // Odd Pada (Pathya rule): 5=I, 6=S, 7=S (Y-gan pattern I-S-S)
+        // But Vipula (exceptions) allow 7th to be I/S dependent on others.
+        // We will just report the state but be very lenient for Odd padas to support Vipulas
+         followsPattern = true; // Assume valid unless we want to implement all Vipula logic
+         
+         // Basic sanity check for standard Pathya: I-S-S
+         // But we won't penalize confidence heavily if it matches a known Vipula pattern
       }
     }
 
@@ -371,9 +382,11 @@ export function detectAnustubh(text: string): AnustubhResult {
       syllableCount,
       syllables,
       aksharas: pada.aksharas,
-      eighthSyllableGuru,
       fifthSyllableLaghu,
       sixthSyllableGuru,
+      seventhSyllableLaghu,
+      isEvenPada,
+      followsPattern,
       errors,
       text: pada.text,
     };
@@ -382,52 +395,32 @@ export function detectAnustubh(text: string): AnustubhResult {
   const totalSyllables = allSyllables.length;
 
   // Calculate confidence score
-  // Mandatory rules: 4 padas + correct syllable count + 8th syllable guru = much higher weight
-  // Optional rules: 5th laghu, 6th guru for even padas = lower weight
+  // 1. Structure: 4 padas (20%)
+  // 2. Syllable Count: 8 per pada (20%)
+  // 3. Even Pada Rules: 5=I 6=S 7=I (60%) - This is the distinguishing feature
 
-  const padaCountCorrect = padas.length === 4;
-  const syllableCountsCorrect = padaAnalysis.every(
-    (p) => p.syllableCount === 8
-  );
-
-  // Base score from mandatory rules
   let confidence = 0;
 
-  if (padaCountCorrect) {
-    confidence += 30; // 30% for having 4 padas
-  }
+  if (padas.length === 4) confidence += 20;
 
-  if (syllableCountsCorrect) {
-    confidence += 30; // 30% for correct syllable counts
-  } else {
-    // Partial credit based on how close we are
-    const correctPadas = padaAnalysis.filter(
-      (p) => p.syllableCount === 8
-    ).length;
-    confidence += (correctPadas / 4) * 30;
-  }
+  const correctSyllableCounts = padaAnalysis.filter(p => p.syllableCount === 8).length;
+  confidence += (correctSyllableCounts / 4) * 20;
 
-  // 8th syllable guru (mandatory) - 30%
-  if (totalMandatoryRules > 0) {
-    confidence += (mandatoryRulesMet / totalMandatoryRules) * 30;
-  }
+  const validEvenPadas = padaAnalysis.filter(p => p.isEvenPada && p.followsPattern).length;
+  // There are 2 even padas
+  confidence += (validEvenPadas / 2) * 60;
 
-  // Optional rules - 10%
-  if (totalOptionalRules > 0) {
-    confidence += (optionalRulesMet / totalOptionalRules) * 10;
-  }
-
-  // Determine if it's Anustubh
-  // Primary requirements: 4 padas with 8 syllables each
-  // The 8th syllable guru rule is common but flexible in classical Anustubh
-  // STRICT CHECK: Total syllables must be 32 (or very close, 31-33) to avoid false positives for longer meters
-  const correctTotalSyllables = totalSyllables >= 31 && totalSyllables <= 33;
-
-  const isAnustubh =
-    padaCountCorrect &&
-    syllableCountsCorrect &&
+  // STRICT FILTER:
+  // Must have proper total syllable count (30-34)
+  // MUST have at least 1 valid Even Pada pattern (strong indicator)
+  // False positives usually fail Even Pada rules completely
+  const correctTotalSyllables = totalSyllables >= 30 && totalSyllables <= 34;
+  
+  // If confidence is high (>70) and even padas match, we are good.
+  const isAnustubh = 
     correctTotalSyllables &&
-    mandatoryRulesMet >= Math.floor(totalMandatoryRules * 0.5); // At least 50% of 8th syllables should be guru
+    (validEvenPadas === 2) && // Both even padas must be proper Anustubh
+    confidence > 80;
 
   return {
     isAnustubh,
