@@ -334,7 +334,7 @@ function TestChhanda() {
                 {anustubhResult.padaAnalysis.map((pada, padaIndex) => {
                   const isEvenPada = (padaIndex + 1) % 2 === 0;
                   const hasCorrectCount = pada.syllableCount === 8;
-                  const isCorrect = hasCorrectCount && pada.eighthSyllableGuru;
+                  const isCorrect = hasCorrectCount && pada.sixthSyllableGuru;
 
                   return (
                     <div key={padaIndex} className="space-y-4">
@@ -368,12 +368,12 @@ function TestChhanda() {
                         </span>
                         <span
                           className={
-                            pada.eighthSyllableGuru
+                            pada.sixthSyllableGuru
                               ? "text-green-600"
                               : "text-red-600"
                           }
                         >
-                          ८औं गुरु: {pada.eighthSyllableGuru ? "✓" : "✗"}
+                          ८औं गुरु: {pada.sixthSyllableGuru ? "✓" : "✗"}
                         </span>
                         <span
                           className={
