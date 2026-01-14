@@ -267,7 +267,7 @@ export default function Home() {
               <button
                 onClick={handleCheck}
                 disabled={!input.trim() || isAnalyzing}
-                className={`px-5 py-2 rounded text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                className={`px-3 py-2 sm:px-5 sm:py-2 rounded text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
                   !input.trim() || isAnalyzing
                     ? "bg-blue-600 text-white cursor-not-allowed"
                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-900 focus:ring-offset-2"
