@@ -57,6 +57,7 @@ const MATRA_LONG = new Set([
 const MATRA_SHORT = new Set(["\u093F", "\u0941", "\u0943"]);
 
 const DIACRITICS = new Set([ANUSVARA, CHANDRA_BINDU, VISARGA]);
+const DIACRITICS_LONG = new Set([ANUSVARA, VISARGA]);
 
 const consonantRe = /[\u0915-\u0939\u0958-\u095F]/u;
 const independentVowelRe = /[\u0904-\u0914\u0960-\u0963]/u;
@@ -167,7 +168,7 @@ export function detectSyllablesWithMapping(text: string): SyllableAnalysis {
     }
 
     if (!isGuru && containsAny(token, MATRA_LONG)) isGuru = true;
-    if (!isGuru && containsAny(token, DIACRITICS)) isGuru = true;
+    if (!isGuru && containsAny(token, DIACRITICS_LONG)) isGuru = true;
 
     let maybeShort = false;
     if (!isGuru) {
