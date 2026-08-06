@@ -31,8 +31,11 @@ const EXAMPLES = [
     title: "वसन्ततिलका छन्द",
     titleEn: "Vasantatilaka",
     chhanda: "वसन्ततिलका",
-    text: `उद्दीप्यते प्रणयिनीषु न तादृशीषु
-तारास्तनाद्रिविहृतौ च न द्रष्टृषाम्`,
+    text: `
+    फुल्दो लतासरि छ यो बुझ जिन्दगानी ।
+थाक्रो दिएर धर्तीको अनि शील पानी ।।
+राम्रो दिएर यसको गर छाँटकाँट ।
+फुल्ने छ यो सकल मग्मग दिव्यठाँट ।।म्`,
     description: "प्रेम काव्य",
     descriptionEn: "Love Poetry"
   },
@@ -41,8 +44,10 @@ const EXAMPLES = [
     title: "इन्द्रवज्रा छन्द",
     titleEn: "Indravajra",
     chhanda: "इन्द्रवज्रा",
-    text: `माता धाता पितुर्गतिर्महीपते
-तं मां वृणीष्व महादेवि पापात्`,
+    text: `अर्थो हि कन्या परकीय एव,
+तामद्य सम्प्रेष्य परिग्रहीतृः।
+जातो ममायं विशदः प्रकामं,
+प्रत्यर्पितन्यास इवान्तरात्मा॥`,
     description: "स्तुति काव्य",
     descriptionEn: "Devotional Poetry"
   },
@@ -76,36 +81,7 @@ const EXAMPLES = [
     description: "वंश वर्णन",
     descriptionEn: "Dynasty"
   },
-  {
-    id: 8,
-    title: "द्रुतविलम्बित छन्द",
-    titleEn: "Drutavilambita",
-    chhanda: "द्रुतविलम्बित",
-    text: `न खलु गोपिकानन्दनो भवान्
-अखिलदेहिनामन्तरात्मदृक्`,
-    description: "श्रीमद्भागवत",
-    descriptionEn: "Bhagavatam"
-  },
-  {
-    id: 9,
-    title: "स्रग्धरा छन्द",
-    titleEn: "Sragdhara",
-    chhanda: "स्रग्धरा",
-    text: `श्रीवत्साङ्कं पृथुकुचतटं कौस्तुभालंकृताङ्गं
-पीताम्बर्ं सुरुचिरातिसुन्दरं नीलजीमूतकान्तम्`,
-    description: "भगवान विष्णु",
-    descriptionEn: "Lord Vishnu"
-  },
-  {
-    id: 10,
-    title: "शिखरिणी छन्द",
-    titleEn: "Shikhirini",
-    chhanda: "शिखरिणी",
-    text: `रसमयी वसन्ताशोके तपवने विलासिनी
-मधुकरी झंकृतिप्रगीतं मधुरमुदीरयति`,
-    description: "वसन्त वर्णन",
-    descriptionEn: "Spring"
-  }
+
 ];
 
 export default function Examples() {
