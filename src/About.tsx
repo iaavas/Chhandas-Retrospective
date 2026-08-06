@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { CHHANDAS } from "./utils/constant";
+import { CHHANDAS } from "@chhandas/core";
 import SEO, { pageSEO } from "./components/SEO";
 
 export default function About() {

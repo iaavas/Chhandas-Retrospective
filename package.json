@@ -3,9 +3,15 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "workspaces": [
+    "packages/*",
+    "mcp"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:core": "npm run build --workspace=packages/chhandas-core",
+    "build:mcp": "npm run build:core && npm run build --workspace=mcp",
     "lint": "eslint .",
     "preview": "vite preview"
   },

@@ -1,6 +1,6 @@
 import SEO, { pageSEO } from "./components/SEO";
-import { processStanza, type AnustubhResult } from "./utils/chhandas";
-import type { SYLLABLE } from "./utils/constant";
+import { processStanza, type AnustubhResult } from "@chhandas/core";
+import type { SYLLABLE } from "@chhandas/core";
 import { useLanguage } from "./contexts/LanguageContext";
 import LineAnalysis from "./components/LineAnalysis";
 import React from "react";
