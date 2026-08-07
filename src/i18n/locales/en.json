@@ -1,15 +1,15 @@
 {
   "nav": {
-    "home": "Home",
-    "test": "Test",
+    "home": "HOME",
+    "test": "TEST",
     "pattern": "Pattern",
     "syllable": "Syllable",
     "quiz": "Quiz",
     "assistant": "Assistant",
     "comparison": "Comparison",
     "visualizer": "Visualizer",
-    "about": "About",
-    "examples": "Examples"
+    "about": "ABOUT",
+    "examples": "EXAMPLES"
   },
   "common": {
     "analyze": "Analyze",

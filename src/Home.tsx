@@ -3,6 +3,8 @@ import { processStanza, type AnustubhResult } from "@chhandas/core";
 import type { SYLLABLE } from "@chhandas/core";
 import { useLanguage } from "./contexts/LanguageContext";
 import LineAnalysis from "./components/LineAnalysis";
+import { PiFlowerLotusDuotone } from "react-icons/pi";
+
 import React from "react";
 
 export default function Home() {
@@ -107,8 +109,8 @@ export default function Home() {
   const detectedChhanda = output?.overallChhanda
     ? output.overallChhanda
     : output?.anustubhResult?.isAnustubh
-    ? "अनुष्टुप्"
-    : null;
+      ? "अनुष्टुप्"
+      : null;
 
   const lineCount = input.trim()
     ? input
@@ -269,8 +271,8 @@ export default function Home() {
                 disabled={!input.trim() || isAnalyzing}
                 className={`px-3 py-2 sm:px-5 sm:py-2 rounded text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
                   !input.trim() || isAnalyzing
-                    ? "bg-blue-600 text-white cursor-not-allowed"
-                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-900 focus:ring-offset-2"
+                    ? "bg-[#01ABFD]/90 text-white cursor-not-allowed"
+                    : "bg-[#00bfff] text-white hover:bg-[#01ABFD]/90 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#01ABFD] focus:ring-offset-2"
                 }`}
                 aria-label={t("common.analyze")}
               >
@@ -310,7 +312,7 @@ export default function Home() {
         {detectedChhanda && (
           <div
             ref={resultRef}
-            className="mb-10 py-8 text-center bg-slate-50/60 -mx-4 px-4"
+            className="mb-10 py-8 text-center bg-[#01ABFD]/1 -mx-4 px-4 rounded-lg animate-analysis-reveal"
             role="status"
             aria-live="polite"
             aria-atomic="true"
@@ -322,12 +324,14 @@ export default function Home() {
               className="text-slate-900 text-6xl"
               aria-label={`Detected chhanda: ${detectedChhanda}`}
             >
-              {detectedChhanda}
+              <div className="flex items-center justify-center gap-8">
+                {detectedChhanda}
+              </div>
             </span>
             {detectedChhanda === "अनुष्टुप्" &&
               output?.anustubhResult?.isAnustubh && (
                 <span
-                  className="block text-sm text-slate-600 mt-2"
+                  className="block text-sm text-slate-600 mt-5"
                   aria-label={`Confidence: ${output.anustubhResult.confidence}%`}
                 >
                   {output.anustubhResult.confidence}%

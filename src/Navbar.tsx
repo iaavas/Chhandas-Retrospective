@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { useLanguage } from "./contexts/LanguageContext";
+import { PiFlowerLotusDuotone } from "react-icons/pi";
 
 export default function Navbar() {
   const location = useLocation();
@@ -26,13 +27,16 @@ export default function Navbar() {
       <div className="max-w-3xl mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link
-            to="/"
-            className="text-lg font-medium text-slate-800 hover:text-slate-600"
-            onClick={closeMenu}
-          >
-            छन्द
-          </Link>
+          <div className="flex items-center gap-2">
+            <PiFlowerLotusDuotone size="2rem" color="#01ABFD" title="gold" />
+            <Link
+              to="/"
+              className="text-lg font-medium text-slate-800 hover:text-slate-600"
+              onClick={closeMenu}
+            >
+              छन्द
+            </Link>
+          </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
@@ -82,9 +86,9 @@ export default function Navbar() {
 
             <button
               onClick={toggleLanguage}
-              className="text-base text-slate-500 hover:text-slate-700"
+              className=" text-slate-500 hover:text-slate-700 text-2xl cursor-pointer border-l-1 border-slate-300 pl-2 ml-6"
             >
-              {currentLanguage === "ne" ? "EN" : "ने"}
+              {currentLanguage === "ne" ? "🇬🇧" : "🇳🇵"}
             </button>
           </div>
 
