@@ -798,7 +798,7 @@
     "@babel/helper-string-parser" "^7.27.1"
     "@babel/helper-validator-identifier" "^7.28.5"
 
-"@chhandas/core@*", "@chhandas/core@file:/Users/aavashbaral/Documents/Developer/Chhandas-Retrospective/packages/chhandas-core":
+"@chhandas/core@file:../packages/chhandas-core", "@chhandas/core@file:/Users/aavashbaral/Documents/Developer/Chhandas-Retrospective/packages/chhandas-core":
   version "1.0.0"
   resolved "file:packages/chhandas-core"
 
@@ -1732,7 +1732,7 @@ chalk@^4.0.0:
   version "1.0.0"
   resolved "file:mcp"
   dependencies:
-    "@chhandas/core" "*"
+    "@chhandas/core" "file:../packages/chhandas-core"
     "@modelcontextprotocol/sdk" "^1.0.0"
 
 chownr@^3.0.0:
