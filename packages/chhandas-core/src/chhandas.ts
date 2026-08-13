@@ -1,4 +1,4 @@
-import { CHHANDAS, type SYLLABLE } from "./constant.js";
+import { CHHANDAS, VISHAMA_CHHANDAS, type SYLLABLE } from "./constant.js";
 
 // ─── Unicode constants ────────────────────────────────────────────────────────
 const VIRAMA = "\u094D";
@@ -163,6 +163,20 @@ export function detectChhanda(ganaSeq: string[]): string | null {
       ganaSeq.join("").replace(/-/g, "")
     )
       return name;
+  }
+  return null;
+}
+
+/** Detect viṣama-vṛtta by matching all 4 pādas against per-pāda patterns. */
+export function detectVishamaChhanda(padaGanaSeqs: string[][]): string | null {
+  if (padaGanaSeqs.length !== 4) return null;
+  for (const [name, padaPatterns] of Object.entries(VISHAMA_CHHANDAS)) {
+    const matches = padaPatterns.every(
+      (pattern, i) =>
+        pattern.join("").replace(/-/g, "") ===
+        padaGanaSeqs[i].join("").replace(/-/g, "")
+    );
+    if (matches) return name;
   }
   return null;
 }
@@ -349,11 +363,21 @@ export function processStanza(text: string): StanzaResult {
     return { line: lineText, syllables, aksharas, aksharaToSyllableMap, ganaSeq, chhanda };
   });
 
+  // Try sama-vṛtta: all lines match the same meter
   const chhandas = results.map((r) => r.chhanda).filter(Boolean);
-  const overallChhanda =
+  let overallChhanda: string | null =
     chhandas.length > 0 && chhandas.every((c) => c === chhandas[0])
       ? chhandas[0]!
       : null;
+
+  // Try viṣama-vṛtta: match all 4 pādas together against per-pāda patterns
+  if (!overallChhanda && results.length === 4) {
+    const padaGanaSeqs = results.map((r) => r.ganaSeq);
+    const vishamaMatch = detectVishamaChhanda(padaGanaSeqs);
+    if (vishamaMatch) {
+      overallChhanda = vishamaMatch;
+    }
+  }
 
   const anustubhResult = detectAnustubh(text);
 

@@ -123,6 +123,17 @@ export const CHHANDAS: Record<string, string[]> = {
   आर्या: [], // Arya meter – special matra rules
 };
 
+/** Viṣama-vṛtta meters: each pāda can have a different pattern.
+ *  Each entry maps a meter name to an array of 4 gana-sequence arrays (one per pāda). */
+export const VISHAMA_CHHANDAS: Record<string, string[][]> = {
+  प्रेमा: [
+    ["ISI", "SSI", "ISI", "SS"],  // pāda 1: LGLGGLLGLGG
+    ["ISI", "SSI", "ISI", "SS"],  // pāda 2: LGLGGLLGLGG
+    ["SSI", "SSI", "ISI", "SS"],  // pāda 3: GGLGGLLGLGG
+    ["ISI", "SSI", "ISI", "SS"],  // pāda 4: LGLGGLLGLGG
+  ],
+};
+
 /** Human-readable descriptions for each meter */
 export const CHHANDAS_INFO: Record<
   string,
@@ -236,5 +247,11 @@ export const CHHANDAS_INFO: Record<
     classification: "Mātrā-vṛtta",
     description:
       "Arya meter. Matra-based with special rules for each pada.",
+  },
+  प्रेमा: {
+    syllablesPerLine: 11,
+    classification: "Viṣama-vṛtta",
+    description:
+      "11-syllable viṣama-vṛtta. Pādas 1, 2, 4 follow Upendravajrā pattern; pāda 3 follows Indravajrā pattern.",
   },
 };
