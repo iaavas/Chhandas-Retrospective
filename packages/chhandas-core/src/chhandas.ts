@@ -8,18 +8,31 @@ const CHANDRA_BINDU = "\u0901";
 const VISARGA = "\u0903";
 
 const INDEPENDENT_LONG = new Set([
-  "\u0906", "\u0908", "\u090A", "\u090F",
-  "\u0910", "\u0913", "\u0914",
+  "\u0906",
+  "\u0908",
+  "\u090A",
+  "\u090F",
+  "\u0910",
+  "\u0913",
+  "\u0914",
 ]);
 const INDEPENDENT_SHORT = new Set(["\u0905", "\u0907", "\u0909", "\u090B"]);
 
 const MATRA_LONG = new Set([
-  "\u093E", "\u0940", "\u0942", "\u0947",
-  "\u0948", "\u094B", "\u094C", "\u0962", "\u0963",
+  "\u093E",
+  "\u0940",
+  "\u0942",
+  "\u0947",
+  "\u0948",
+  "\u094B",
+  "\u094C",
+  "\u0962",
+  "\u0963",
 ]);
 const MATRA_SHORT = new Set(["\u093F", "\u0941", "\u0943"]);
 
 const DIACRITICS = new Set([ANUSVARA, CHANDRA_BINDU, VISARGA]);
+const DIACRITICS_LONG = new Set([ANUSVARA, VISARGA]);
 
 const consonantRe = /[\u0915-\u0939\u0958-\u095F]/u;
 const independentVowelRe = /[\u0904-\u0914\u0960-\u0963]/u;
@@ -34,11 +47,13 @@ const aksharaRegex = new RegExp(
     "|" +
     "[\\u0915-\\u0939\\u0958-\\u095F](?:\\u093C)?" +
     "(?:\\u094D[\\u0915-\\u0939\\u0958-\\u095F](?:\\u093C)?)*" +
-    "(?:" + matraRange + ")*" +
+    "(?:" +
+    matraRange +
+    ")*" +
     "(?:\\u094D)?" +
     "(?:[\\u0901-\\u0903\\u0951-\\u0954])?" +
     ")",
-  "gu"
+  "gu",
 );
 
 // ─── Akshara splitting ────────────────────────────────────────────────────────
@@ -112,12 +127,13 @@ export function detectSyllablesWithMapping(text: string): SyllableAnalysis {
     }
 
     if (!isGuru && containsAny(token, MATRA_LONG)) isGuru = true;
-    if (!isGuru && containsAny(token, DIACRITICS)) isGuru = true;
+    if (!isGuru && containsAny(token, DIACRITICS_LONG)) isGuru = true;
 
     let maybeShort = false;
     if (!isGuru) {
       if (containsAny(token, MATRA_SHORT)) maybeShort = true;
-      else if (token.length === 1 && INDEPENDENT_SHORT.has(token)) maybeShort = true;
+      else if (token.length === 1 && INDEPENDENT_SHORT.has(token))
+        maybeShort = true;
       else if (!matraRe.test(token) && consonantRe.test(token[0])) {
         maybeShort = true;
       }
@@ -159,8 +175,7 @@ function toGanas(seq: SYLLABLE[]): string[] {
 export function detectChhanda(ganaSeq: string[]): string | null {
   for (const [name, pattern] of Object.entries(CHHANDAS)) {
     if (
-      pattern.join("").replace(/-/g, "") ===
-      ganaSeq.join("").replace(/-/g, "")
+      pattern.join("").replace(/-/g, "") === ganaSeq.join("").replace(/-/g, "")
     )
       return name;
   }
@@ -174,7 +189,7 @@ export function detectVishamaChhanda(padaGanaSeqs: string[][]): string | null {
     const matches = padaPatterns.every(
       (pattern, i) =>
         pattern.join("").replace(/-/g, "") ===
-        padaGanaSeqs[i].join("").replace(/-/g, "")
+        padaGanaSeqs[i].join("").replace(/-/g, ""),
     );
     if (matches) return name;
   }
@@ -235,14 +250,17 @@ export function detectAnustubh(text: string): AnustubhResult {
     }
   }
 
-  const padas: { text: string; aksharas: string[]; syllables: SYLLABLE[] }[] = [];
+  const padas: { text: string; aksharas: string[]; syllables: SYLLABLE[] }[] =
+    [];
 
   for (let padaIdx = 0; padaIdx < 4; padaIdx++) {
     const syllableStart = padaIdx * 8;
     const syllableEnd = Math.min(syllableStart + 8, allSyllables.length);
     const padaSyllables = allSyllables.slice(syllableStart, syllableEnd);
 
-    const aksharaStart = aksharaToSyllableMap.findIndex((s) => s === syllableStart);
+    const aksharaStart = aksharaToSyllableMap.findIndex(
+      (s) => s === syllableStart,
+    );
     let aksharaEnd = aksharaToSyllableMap.findIndex((s) => s === syllableEnd);
     if (aksharaEnd === -1) aksharaEnd = allAksharas.length;
 
@@ -254,12 +272,18 @@ export function detectAnustubh(text: string): AnustubhResult {
     }
 
     const padaAksharas = allAksharas.slice(aksharaStart, aksharaEnd);
-    padas.push({ text: padaAksharas.join(""), aksharas: padaAksharas, syllables: padaSyllables });
+    padas.push({
+      text: padaAksharas.join(""),
+      aksharas: padaAksharas,
+      syllables: padaSyllables,
+    });
   }
 
   const actualPadaCount = padas.filter((p) => p.syllables.length > 0).length;
   if (actualPadaCount !== 4) {
-    overallErrors.push(`अनुष्टुभ्मा ४ पाद चाहिन्छ, तर ${actualPadaCount} पाद भेटियो`);
+    overallErrors.push(
+      `अनुष्टुभ्मा ४ पाद चाहिन्छ, तर ${actualPadaCount} पाद भेटियो`,
+    );
   }
 
   const padaAnalysis: AnustubhPadaAnalysis[] = padas.map((pada, index) => {
@@ -269,7 +293,9 @@ export function detectAnustubh(text: string): AnustubhResult {
     const isEvenPada = (index + 1) % 2 === 0;
 
     if (syllableCount !== 8) {
-      errors.push(`पाद ${index + 1}: ८ अक्षर चाहिन्छ, तर ${syllableCount} अक्षर भेटियो`);
+      errors.push(
+        `पाद ${index + 1}: ८ अक्षर चाहिन्छ, तर ${syllableCount} अक्षर भेटियो`,
+      );
     }
 
     const fifthSyllableLaghu = syllables[4] === "I";
@@ -283,9 +309,12 @@ export function detectAnustubh(text: string): AnustubhResult {
         if (fifthSyllableLaghu && sixthSyllableGuru && seventhSyllableLaghu) {
           followsPattern = true;
         } else {
-          if (!fifthSyllableLaghu) errors.push(`पाद ${index + 1} (सम): ५औं अक्षर लघु हुनुपर्छ`);
-          if (!sixthSyllableGuru) errors.push(`पाद ${index + 1} (सम): ६औं अक्षर गुरु हुनुपर्छ`);
-          if (!seventhSyllableLaghu) errors.push(`पाद ${index + 1} (सम): ७औं अक्षर लघु हुनुपर्छ`);
+          if (!fifthSyllableLaghu)
+            errors.push(`पाद ${index + 1} (सम): ५औं अक्षर लघु हुनुपर्छ`);
+          if (!sixthSyllableGuru)
+            errors.push(`पाद ${index + 1} (सम): ६औं अक्षर गुरु हुनुपर्छ`);
+          if (!seventhSyllableLaghu)
+            errors.push(`पाद ${index + 1} (सम): ७औं अक्षर लघु हुनुपर्छ`);
         }
       } else {
         followsPattern = true; // Odd padas support Vipula variations
@@ -311,16 +340,18 @@ export function detectAnustubh(text: string): AnustubhResult {
 
   let confidence = 0;
   if (padas.length === 4) confidence += 20;
-  const correctSyllableCounts = padaAnalysis.filter((p) => p.syllableCount === 8).length;
+  const correctSyllableCounts = padaAnalysis.filter(
+    (p) => p.syllableCount === 8,
+  ).length;
   confidence += (correctSyllableCounts / 4) * 20;
-  const validEvenPadas = padaAnalysis.filter((p) => p.isEvenPada && p.followsPattern).length;
+  const validEvenPadas = padaAnalysis.filter(
+    (p) => p.isEvenPada && p.followsPattern,
+  ).length;
   confidence += (validEvenPadas / 2) * 60;
 
   const correctTotalSyllables = totalSyllables >= 30 && totalSyllables <= 34;
   const isAnustubh =
-    correctTotalSyllables &&
-    validEvenPadas === 2 &&
-    confidence > 80;
+    correctTotalSyllables && validEvenPadas === 2 && confidence > 80;
 
   return {
     isAnustubh,
@@ -356,11 +387,19 @@ export function processStanza(text: string): StanzaResult {
 
   const results: LineResult[] = lines.map((line) => {
     const lineText = line.trim();
-    const { syllables, aksharaToSyllableMap } = detectSyllablesWithMapping(lineText);
+    const { syllables, aksharaToSyllableMap } =
+      detectSyllablesWithMapping(lineText);
     const ganaSeq = toGanas(syllables);
     const chhanda = detectChhanda(ganaSeq);
     const aksharas = splitAksharas(lineText);
-    return { line: lineText, syllables, aksharas, aksharaToSyllableMap, ganaSeq, chhanda };
+    return {
+      line: lineText,
+      syllables,
+      aksharas,
+      aksharaToSyllableMap,
+      ganaSeq,
+      chhanda,
+    };
   });
 
   // Try sama-vṛtta: all lines match the same meter
