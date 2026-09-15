@@ -3,8 +3,8 @@ import {
   processStanza,
   detectAnustubh,
   type AnustubhResult,
-} from "./utils/chhandas";
-import { GANAS, CHHANDAS, type SYLLABLE } from "./utils/constant";
+} from "@chhandas/core";
+import { GANAS, CHHANDAS, type SYLLABLE } from "@chhandas/core";
 import SEO, { pageSEO } from "./components/SEO";
 
 function TestChhanda() {

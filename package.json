@@ -3,9 +3,15 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "workspaces": [
+    "packages/*",
+    "mcp"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:core": "npm run build --workspace=packages/chhandas-core",
+    "build:mcp": "npm run build:core && npm run build --workspace=mcp",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -19,6 +25,7 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-i18next": "^15.7.3",
+    "react-icons": "^5.7.0",
     "react-router-dom": "^7.9.1",
     "tone": "^15.1.22"
   },

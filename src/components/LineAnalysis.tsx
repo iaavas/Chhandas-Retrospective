@@ -1,6 +1,6 @@
 import React from "react";
-import type { SYLLABLE } from "../utils/constant";
-import { GANAS } from "../utils/constant";
+import type { SYLLABLE } from "@chhandas/core";
+import { GANAS } from "@chhandas/core";
 
 interface LineAnalysisProps {
   result: {
